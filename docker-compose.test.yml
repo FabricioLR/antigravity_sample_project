@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile.dev
+    container_name: web_storage_app_test
+    working_dir: /var/www/html
+    volumes:
+      - ./:/var/www/html
+    environment:
+      - DB_CONNECTION=pgsql
+      - DB_HOST=db_test
+      - DB_PORT=5432
+      - DB_DATABASE=web_storage_test
+      - DB_USERNAME=test_user
+      - DB_PASSWORD=test_pass
+    depends_on:
+      - db_test
+
+  db_test:
+    image: postgres:15-alpine
+    container_name: web_storage_db_test
+    environment:
+      POSTGRES_DB: web_storage_test
+      POSTGRES_USER: test_user
+      POSTGRES_PASSWORD: test_pass
+    # No volume mapping for persistence, ephemeral DB for tests purely
+
