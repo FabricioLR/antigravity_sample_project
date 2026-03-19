@@ -76,6 +76,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'download' && isset($_GET['fil
 
 $files = $fileManager->listFiles();
 $successMsg = $_GET['success'] ?? $success;
+$errorMsg = $_GET['error'] ?? $error;
 
 function formatBytes($bytes, $precision = 2) { 
     $units = array('B', 'KB', 'MB', 'GB', 'TB'); 
@@ -124,8 +125,8 @@ function formatBytes($bytes, $precision = 2) {
             </form>
         </div>
 
-        <?php if ($error): ?>
-            <div class="alert alert-error"><?= htmlspecialchars($error) ?></div>
+        <?php if ($errorMsg): ?>
+            <div class="alert alert-error"><?= htmlspecialchars($errorMsg) ?></div>
         <?php endif; ?>
         <?php if ($successMsg): ?>
             <div class="alert alert-success"><?= htmlspecialchars($successMsg) ?></div>
@@ -158,6 +159,15 @@ function formatBytes($bytes, $precision = 2) {
                                 <td><?= formatBytes($file['size']) ?></td>
                                 <td><?= date('d/m/Y H:i', $file['modified']) ?></td>
                                 <td style="text-align: right; display: flex; justify-content: flex-end; gap: 0.5rem;">
+                                    <?php 
+                                    $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+                                    $textExtensions = ['txt', 'json', 'md', 'csv', 'log', 'xml', 'yml', 'yaml', 'php', 'html', 'css', 'js'];
+                                    if (in_array($ext, $textExtensions)): 
+                                    ?>
+                                    <a href="/edit.php?file=<?= urlencode($file['name']) ?>" class="btn btn-primary" style="padding: 0.4rem 0.8rem;">
+                                        <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="vertical-align: sub;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg> Editar
+                                    </a>
+                                    <?php endif; ?>
                                     <a href="/dashboard.php?action=download&file=<?= urlencode($file['name']) ?>" class="btn" style="background: rgba(255,255,255,0.1); color: var(--text-main); padding: 0.4rem 0.8rem;">
                                         Baixar
                                     </a>
