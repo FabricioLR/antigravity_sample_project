@@ -98,4 +98,20 @@ class FileManager {
         }
         return $path;
     }
+
+    public function getFileContent(string $filename): string {
+        $path = $this->getFilePath($filename);
+        $content = @file_get_contents($path);
+        if ($content === false) {
+            throw new Exception("Failed to read file.");
+        }
+        return $content;
+    }
+
+    public function updateFileContent(string $filename, string $content): void {
+        $path = $this->getFilePath($filename);
+        if (@file_put_contents($path, $content) === false) {
+            throw new Exception("Failed to write to file.");
+        }
+    }
 }
