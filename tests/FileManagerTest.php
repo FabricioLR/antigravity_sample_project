@@ -108,4 +108,23 @@ class FileManagerTest extends TestCase {
         $this->assertEquals($this->testStorageRoot . '/user_1/test_path.txt', $path);
         $this->assertTrue(file_exists($path));
     }
+
+    public function testCanGetAndUpdateFileContent() {
+        $tmpFile = tempnam(sys_get_temp_dir(), 'test');
+        file_put_contents($tmpFile, 'initial text');
+        
+        $this->fileManager->uploadFile([
+            'name' => 'editor_test.txt',
+            'tmp_name' => $tmpFile,
+            'error' => UPLOAD_ERR_OK
+        ]);
+
+        $content = $this->fileManager->getFileContent('editor_test.txt');
+        $this->assertEquals('initial text', $content);
+
+        $this->fileManager->updateFileContent('editor_test.txt', 'modified text');
+
+        $contentAfter = $this->fileManager->getFileContent('editor_test.txt');
+        $this->assertEquals('modified text', $contentAfter);
+    }
 }
