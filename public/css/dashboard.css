@@ -1,0 +1,98 @@
+/* Navbar */
+.dashboard-nav {
+    width: 100%; margin: 0; border-radius: 0; border-left: none; border-right: none; border-top: none; padding: 1rem 2rem;
+}
+.nav-logo-link {
+    text-decoration: none;
+}
+.nav-logo-text {
+    margin: 0;
+}
+.nav-links-override {
+    display: flex; align-items: center; gap: 1rem;
+}
+.dropdown-item-override {
+    margin: 0;
+}
+
+/* Header Action */
+.page-subtitle {
+    color: var(--text-muted); margin-top: 0.5rem;
+}
+.upload-form {
+    display: flex; gap: 0.5rem; align-items: center;
+}
+.upload-label {
+    margin: 0; cursor: pointer;
+}
+.hidden-input {
+    display: none;
+}
+
+/* Empty State */
+.glass-panel-override {
+    overflow: hidden;
+}
+.empty-icon {
+    opacity: 0.5; margin-bottom: 1rem;
+}
+.empty-text {
+    margin-top: 0.5rem;
+}
+
+/* Action Bar */
+.action-bar-override {
+    display: flex; min-height: 60px; gap: 0.5rem; padding: 0.75rem 1rem; border-radius: 0; border-top: 0; border-left: 0; border-right: 0; align-items: center; border-bottom: 1px solid var(--border);
+}
+.action-btn-rename {
+    display: none; background: rgba(0,0,0,0.05); color: var(--text-main); padding: 0.4rem 0.8rem;
+}
+.action-btn-edit {
+    display: none; padding: 0.4rem 0.8rem;
+}
+.action-btn-download {
+    display: none; background: rgba(0,0,0,0.05); color: var(--text-main); padding: 0.4rem 0.8rem;
+}
+.action-btn-delete {
+    display: none; padding: 0.4rem 0.8rem;
+}
+.selection-count {
+    margin-left: auto; color: var(--text-muted); font-size: 0.9rem;
+}
+
+/* Table */
+.th-checkbox {
+    width: 40px; text-align: center;
+}
+.cursor-pointer {
+    cursor: pointer;
+}
+.td-checkbox {
+    text-align: center;
+}
+.filename-cell {
+    font-weight: 500; display: flex; align-items: center; gap: 0.5rem; border: none;
+}
+.file-icon {
+    color: var(--text-muted);
+}
+
+/* Responsive Dashboard */
+@media (max-width: 768px) {
+    .action-bar-override {
+        flex-wrap: wrap;
+        padding: 1rem;
+        min-height: auto;
+    }
+    .action-bar-override button {
+        flex: 1 1 auto;
+        text-align: center;
+        justify-content: center;
+    }
+    .selection-count {
+        width: 100%;
+        text-align: center;
+        margin-left: 0;
+        margin-top: 0.5rem;
+    }
+}

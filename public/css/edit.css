@@ -1,0 +1,45 @@
+.edit-nav {
+    width: 100%; margin: 0; border-radius: 0; border-left: none; border-right: none; border-top: none; padding: 1rem 2rem;
+}
+.nav-logo-link {
+    text-decoration: none;
+}
+.nav-logo-text {
+    margin: 0;
+}
+.nav-links-override {
+    display: flex; align-items: center; gap: 1rem;
+}
+.dropdown-item-override {
+    margin: 0;
+}
+.edit-container {
+    max-width: 95%;
+}
+.alert-margin {
+    margin-top: 1rem;
+}
+.editor-form {
+    background: #ffffff; border: 1px solid var(--border); border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); overflow: hidden; display: flex; flex-direction: column; height: 75vh; margin-top: 1rem;
+}
+.editor-header {
+    display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1.5rem; background: var(--bg-base); border-bottom: 1px solid var(--border);
+}
+.editor-title-box {
+    display: flex; align-items: center; gap: 0.75rem;
+}
+.editor-title-text {
+    font-weight: 600; color: var(--text-main); font-size: 1.05rem;
+}
+.editor-actions {
+    display: flex; gap: 0.5rem;
+}
+.btn-cancel {
+    background: rgba(0,0,0,0.05); color: var(--text-main); font-size: 0.85rem; padding: 0.5rem 1rem;
+}
+.btn-save {
+    font-size: 0.85rem; padding: 0.5rem 1.25rem;
+}
+.editor-textarea {
+    flex: 1; width: 100%; border: none; padding: 1.5rem; font-family: 'Courier New', Courier, monospace; font-size: 14px; line-height: 1.6; background: #151515; color: #ffffff; resize: none; outline: none; transition: background 0.3s;
+}

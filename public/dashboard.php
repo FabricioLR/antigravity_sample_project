@@ -16,6 +16,11 @@ if (!$auth->isLoggedIn()) {
     exit;
 }
 
+if ($auth->mustChangePassword()) {
+    header('Location: /change_password.php');
+    exit;
+}
+
 // Handle Logout
 if (isset($_GET['action']) && $_GET['action'] === 'logout') {
     $auth->logout();
@@ -126,32 +131,33 @@ function formatBytes($bytes, $precision = 2) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - Web Storage</title>
     <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/dashboard.css">
 </head>
 <body>
-    <nav class="navbar glass-panel" style="width: 100%; margin: 0; border-radius: 0; border-left: none; border-right: none; border-top: none; padding: 1rem 2rem;">
-        <a href="/dashboard.php" style="text-decoration: none;"><h2 class="text-gradient" style="margin: 0;">Web Storage</h2></a>
-        <div class="nav-links" style="display: flex; align-items: center; gap: 1rem;">
+    <nav class="navbar glass-panel dashboard-nav">
+        <a href="/dashboard.php" class="nav-logo-link"><h2 class="text-gradient nav-logo-text">Web Storage</h2></a>
+        <div class="nav-links nav-links-override">
             <div class="profile-dropdown" id="profileDropdown">
                 <div class="profile-icon" onclick="toggleDropdown()">
                     <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
                 </div>
                 <div class="dropdown-menu">
-                    <a href="/dashboard.php" class="dropdown-item" style="margin: 0;">
+                    <a href="/dashboard.php" class="dropdown-item dropdown-item-override">
                         <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path></svg>
                         Meus Arquivos
                     </a>
                     <?php if (isset($auth) && $auth->isAdmin()): ?>
-                    <a href="/admin.php" class="dropdown-item" style="margin: 0;">
+                    <a href="/admin.php" class="dropdown-item dropdown-item-override">
                         <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                         Painel Admin
                     </a>
                     <?php endif; ?>
-                    <a href="/change_password.php" class="dropdown-item" style="margin: 0;">
+                    <a href="/change_password.php" class="dropdown-item dropdown-item-override">
                         <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path></svg>
                         Mudar Senha
                     </a>
                     <div class="dropdown-divider"></div>
-                    <a href="/dashboard.php?action=logout" class="dropdown-item danger" style="margin: 0;">
+                    <a href="/dashboard.php?action=logout" class="dropdown-item danger dropdown-item-override">
                         <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
                         Sair
                     </a>
@@ -165,12 +171,12 @@ function formatBytes($bytes, $precision = 2) {
         <div class="page-header">
             <div>
                 <h1>Meus Arquivos</h1>
-                <p style="color: var(--text-muted); margin-top: 0.5rem;">Gerencie seus documentos em um ambiente seguro</p>
+                <p class="page-subtitle">Gerencie seus documentos em um ambiente seguro</p>
             </div>
             
-            <form action="/dashboard.php" method="POST" enctype="multipart/form-data" style="display: flex; gap: 0.5rem; align-items: center;">
-                <input type="file" name="file" id="file" required style="display: none;" onchange="this.form.submit()">
-                <label for="file" class="btn btn-primary" style="margin: 0; cursor: pointer;">
+            <form action="/dashboard.php" method="POST" enctype="multipart/form-data" class="upload-form">
+                <input type="file" name="file" id="file" required class="hidden-input" onchange="this.form.submit()">
+                <label for="file" class="btn btn-primary upload-label">
                     <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
                     Fazer Upload
                 </label>
@@ -184,12 +190,12 @@ function formatBytes($bytes, $precision = 2) {
             <div class="alert alert-success"><?= htmlspecialchars($successMsg) ?></div>
         <?php endif; ?>
 
-        <div class="glass-panel" style="overflow: hidden;">
+        <div class="glass-panel glass-panel-override">
             <?php if (empty($files)): ?>
                 <div class="empty-state">
-                    <svg width="64" height="64" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="opacity: 0.5; margin-bottom: 1rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                    <svg width="64" height="64" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="empty-icon"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
                     <h3>Nenhum arquivo encontrado</h3>
-                    <p style="margin-top: 0.5rem;">Faça upload do seu primeiro arquivo para começar.</p>
+                    <p class="empty-text">Faça upload do seu primeiro arquivo para começar.</p>
                 </div>
             <?php else: ?>
                 <!-- Bulk Delete Form -->
@@ -205,27 +211,27 @@ function formatBytes($bytes, $precision = 2) {
                     <input type="hidden" name="new_name" id="renameNewInput" value="">
                 </form>
 
-                <div class="action-bar-top glass-panel" id="topActionBar" style="display: flex; min-height: 60px; gap: 0.5rem; padding: 0.75rem 1rem; border-radius: 0; border-top: 0; border-left: 0; border-right: 0; align-items: center; border-bottom: 1px solid var(--border);">
-                    <button class="btn action-btn" id="btnRename" style="display: none; background: rgba(0,0,0,0.05); color: var(--text-main); padding: 0.4rem 0.8rem;" onclick="renameSelected()">
+                <div class="action-bar-top glass-panel action-bar-override" id="topActionBar">
+                    <button class="btn action-btn action-btn-rename" id="btnRename" onclick="renameSelected()">
                         Renomear
                     </button>
-                    <button class="btn btn-primary action-btn" id="btnEdit" onclick="editSelected()" style="display: none; padding: 0.4rem 0.8rem;">
+                    <button class="btn btn-primary action-btn action-btn-edit" id="btnEdit" onclick="editSelected()">
                         <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg> Editar
                     </button>
-                    <button class="btn action-btn" id="btnDownload" style="display: none; background: rgba(0,0,0,0.05); color: var(--text-main); padding: 0.4rem 0.8rem;" onclick="downloadSelected()">
+                    <button class="btn action-btn action-btn-download" id="btnDownload" onclick="downloadSelected()">
                         Baixar
                     </button>
-                    <button class="btn btn-danger action-btn" id="btnDelete" style="display: none; padding: 0.4rem 0.8rem;" onclick="deleteSelected()">
+                    <button class="btn btn-danger action-btn action-btn-delete" id="btnDelete" onclick="deleteSelected()">
                         Apagar
                     </button>
-                    <span style="margin-left: auto; color: var(--text-muted); font-size: 0.9rem;" id="selectionCount">0 itens selecionados</span>
+                    <span class="selection-count" id="selectionCount">0 itens selecionados</span>
                 </div>
 
                 <table class="data-table file-explorer-table">
                     <thead>
                         <tr>
-                            <th style="width: 40px; text-align: center;">
-                                <input type="checkbox" id="selectAllCheckbox" onclick="toggleAllFiles(this)" style="cursor: pointer;">
+                            <th class="th-checkbox">
+                                <input type="checkbox" id="selectAllCheckbox" onclick="toggleAllFiles(this)" class="cursor-pointer">
                             </th>
                             <th>Nome</th>
                             <th>Tamanho</th>
@@ -239,12 +245,12 @@ function formatBytes($bytes, $precision = 2) {
                             $textExtensions = ['txt', 'json', 'md', 'csv', 'log', 'xml', 'yml', 'yaml', 'php', 'html', 'css', 'js'];
                             $isEditable = in_array($ext, $textExtensions) ? 'true' : 'false';
                             ?>
-                            <tr class="file-row" onclick="toggleFileRow(this, event)" data-filename="<?= htmlspecialchars($file['name']) ?>" data-editable="<?= $isEditable ?>">
-                                <td style="text-align: center;">
-                                    <input type="checkbox" class="file-checkbox" onclick="toggleFileCheckbox(this, event)" style="cursor: pointer;">
+                            <tr class="file-row cursor-pointer" onclick="toggleFileRow(this, event)" data-filename="<?= htmlspecialchars($file['name']) ?>" data-editable="<?= $isEditable ?>">
+                                <td class="td-checkbox">
+                                    <input type="checkbox" class="file-checkbox cursor-pointer" onclick="toggleFileCheckbox(this, event)">
                                 </td>
-                                <td style="font-weight: 500; display: flex; align-items: center; gap: 0.5rem; border: none;">
-                                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: var(--text-muted);"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+                                <td class="filename-cell">
+                                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="file-icon"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
                                     <span class="file-name"><?= htmlspecialchars($file['name']) ?></span>
                                 </td>
                                 <td><?= formatBytes($file['size']) ?></td>
@@ -256,181 +262,6 @@ function formatBytes($bytes, $precision = 2) {
             <?php endif; ?>
         </div>
     </div>
-    <script>
-        function toggleDropdown() {
-            document.getElementById('profileDropdown').classList.toggle('active');
-        }
-
-        // Close dropdown when clicking outside
-        document.addEventListener('click', function(event) {
-            const dropdown = document.getElementById('profileDropdown');
-            if (dropdown && !dropdown.contains(event.target)) {
-                dropdown.classList.remove('active');
-            }
-        });
-
-        // File Explorer Selection Logic
-        function updateActionBar() {
-            const checkboxes = document.querySelectorAll('.file-checkbox:checked');
-            const count = checkboxes.length;
-            document.getElementById('selectionCount').innerText = `${count} item${count !== 1 ? 'ns' : ''} selecionado${count !== 1 ? 's' : ''}`;
-            
-            const topActionBar = document.getElementById('topActionBar');
-            const btnRename = document.getElementById('btnRename');
-            const btnEdit = document.getElementById('btnEdit');
-            const btnDownload = document.getElementById('btnDownload');
-            const btnDelete = document.getElementById('btnDelete');
-
-            let canEdit = false;
-            if (count === 1) {
-                const row = checkboxes[0].closest('tr');
-                if (row.getAttribute('data-editable') === 'true') {
-                    canEdit = true;
-                }
-            }
-
-            if (count === 0) {
-                if (btnRename) btnRename.style.display = 'none';
-                if (btnEdit) btnEdit.style.display = 'none';
-                if (btnDownload) btnDownload.style.display = 'none';
-                if (btnDelete) btnDelete.style.display = 'none';
-            } else {
-                if (btnRename) {
-                    btnRename.style.display = (count === 1) ? 'inline-flex' : 'none';
-                    btnRename.disabled = false;
-                }
-
-                if (btnEdit) {
-                    btnEdit.style.display = canEdit ? 'inline-flex' : 'none';
-                    btnEdit.disabled = false;
-                }
-
-                if (btnDownload) {
-                    btnDownload.style.display = 'inline-flex';
-                    btnDownload.disabled = false;
-                }
-
-                if (btnDelete) {
-                    btnDelete.style.display = 'inline-flex';
-                    btnDelete.disabled = false;
-                }
-            }
-        }
-
-        function toggleFileRow(row, event) {
-            if (event.target.tagName.toLowerCase() === 'input') return;
-            const checkbox = row.querySelector('.file-checkbox');
-            checkbox.checked = !checkbox.checked;
-            if (checkbox.checked) {
-                row.classList.add('selected');
-            } else {
-                row.classList.remove('selected');
-            }
-            updateSelectAllState();
-            updateActionBar();
-        }
-
-        function toggleFileCheckbox(checkbox, event) {
-            event.stopPropagation();
-            const row = checkbox.closest('tr');
-            if (checkbox.checked) {
-                row.classList.add('selected');
-            } else {
-                row.classList.remove('selected');
-            }
-            updateSelectAllState();
-            updateActionBar();
-        }
-
-        function toggleAllFiles(mainCheckbox) {
-            const checkboxes = document.querySelectorAll('.file-checkbox');
-            checkboxes.forEach(cb => {
-                cb.checked = mainCheckbox.checked;
-                const row = cb.closest('tr');
-                if (cb.checked) {
-                    row.classList.add('selected');
-                } else {
-                    row.classList.remove('selected');
-                }
-            });
-            updateActionBar();
-        }
-
-        function updateSelectAllState() {
-            const mainCheckbox = document.getElementById('selectAllCheckbox');
-            if(!mainCheckbox) return;
-            const checkboxes = document.querySelectorAll('.file-checkbox');
-            const checkedBoxes = document.querySelectorAll('.file-checkbox:checked');
-            if (checkboxes.length === 0) {
-                mainCheckbox.checked = false;
-                mainCheckbox.indeterminate = false;
-            } else if (checkedBoxes.length === checkboxes.length) {
-                mainCheckbox.checked = true;
-                mainCheckbox.indeterminate = false;
-            } else if (checkedBoxes.length > 0) {
-                mainCheckbox.checked = false;
-                mainCheckbox.indeterminate = true;
-            } else {
-                mainCheckbox.checked = false;
-                mainCheckbox.indeterminate = false;
-            }
-        }
-
-        // Actions
-        function getSelectedFiles() {
-            return Array.from(document.querySelectorAll('.file-checkbox:checked')).map(cb => {
-                return cb.closest('tr').getAttribute('data-filename');
-            });
-        }
-
-        function editSelected() {
-            const files = getSelectedFiles();
-            if (files.length === 1) {
-                const isEditable = document.querySelector(`.file-checkbox:checked`).closest('tr').getAttribute('data-editable') === 'true';
-                if(isEditable) {
-                    window.location.href = '/edit.php?file=' + encodeURIComponent(files[0]);
-                }
-            }
-        }
-
-        function renameSelected() {
-            const files = getSelectedFiles();
-            if (files.length === 1) {
-                const oldName = files[0];
-                const newName = prompt("Digite o novo nome para o arquivo:", oldName);
-                if (newName && newName !== oldName && newName.trim() !== '') {
-                    document.getElementById('renameOldInput').value = oldName;
-                    document.getElementById('renameNewInput').value = newName.trim();
-                    document.getElementById('renameActionForm').submit();
-                }
-            }
-        }
-
-        function downloadSelected() {
-            const files = getSelectedFiles();
-            files.forEach((file, index) => {
-                setTimeout(() => {
-                    const a = document.createElement('a');
-                    a.href = '/dashboard.php?action=download&file=' + encodeURIComponent(file);
-                    // Força a exibição mínima para trigger correto de evento
-                    a.style.display = 'none';
-                    document.body.appendChild(a);
-                    a.click();
-                    document.body.removeChild(a);
-                }, index * 400); // delay para prevenir bloqueio por múltiplas requisições
-            });
-        }
-
-        function deleteSelected() {
-            const files = getSelectedFiles();
-            if (files.length === 0) return;
-            
-            const countText = files.length === 1 ? 'este arquivo' : `estes ${files.length} arquivos`;
-            if (confirm(`Tem certeza que deseja apagar ${countText}? Esta ação é irreversível.`)) {
-                document.getElementById('bulkFilesInput').value = JSON.stringify(files);
-                document.getElementById('bulkActionForm').submit();
-            }
-        }
-    </script>
+    <script src="/js/dashboard.js"></script>
 </body>
 </html>

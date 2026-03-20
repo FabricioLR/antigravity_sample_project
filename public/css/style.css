@@ -89,6 +89,8 @@ h1, h2, h3 {
     align-items: center;
     padding: 1.25rem 2rem;
     margin-bottom: 2rem;
+    position: relative;
+    z-index: 9999;
 }
 
 .nav-links a {
@@ -309,15 +311,13 @@ select:focus {
     position: absolute;
     right: 0;
     top: calc(100% + 10px);
-    background: var(--bg-surface);
-    backdrop-filter: var(--glass-blur);
-    -webkit-backdrop-filter: var(--glass-blur);
+    background: #ffffff;
     border: 1px solid var(--border);
     border-radius: 8px;
     width: 180px;
     display: none;
     flex-direction: column;
-    z-index: 100;
+    z-index: 9999;
     box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
 
@@ -399,4 +399,55 @@ select:focus {
 
 .file-row.selected:hover {
     background-color: rgba(99, 102, 241, 0.25) !important;
+}
+
+.file-name {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Responsive Design */
+.table-container {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 1rem;
+        max-width: 100%;
+    }
+    .navbar {
+        padding: 1rem;
+    }
+    .nav-links {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+    }
+    .nav-links a {
+        margin-left: 0.75rem;
+        margin-right: 0.75rem;
+    }
+    .page-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+    .action-bar {
+        flex-wrap: wrap;
+        padding: 1rem 0;
+    }
+    .action-bar .btn {
+        flex: 1 1 auto;
+        text-align: center;
+    }
+    .auth-box {
+        padding: 1.5rem;
+    }
+    .glass-panel {
+        padding: 1rem;
+    }
 }

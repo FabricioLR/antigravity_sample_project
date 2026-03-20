@@ -16,9 +16,16 @@ try {
             username VARCHAR(255) UNIQUE NOT NULL,
             password VARCHAR(255) NOT NULL,
             role VARCHAR(50) DEFAULT 'user',
+            must_change_password BOOLEAN DEFAULT TRUE,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     ");
+
+    try {
+        $pdo->exec("ALTER TABLE users ADD COLUMN must_change_password BOOLEAN DEFAULT TRUE");
+    } catch (Exception $e) {
+        // Ignora se a coluna já existe
+    }
 
     $userManager = new UserManager($db);
     

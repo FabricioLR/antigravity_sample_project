@@ -38,7 +38,7 @@ class UserManager {
         }
 
         $hash = password_hash($newPassword, PASSWORD_DEFAULT);
-        $updateStmt = $this->db->prepare("UPDATE users SET password = ? WHERE id = ?");
+        $updateStmt = $this->db->prepare("UPDATE users SET password = ?, must_change_password = FALSE WHERE id = ?");
         return $updateStmt->execute([$hash, $userId]);
     }
 
