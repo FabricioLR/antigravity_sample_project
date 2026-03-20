@@ -103,7 +103,7 @@ try {
                 </div>
             </div>
 
-            <textarea name="content" spellcheck="false" style="flex: 1; width: 100%; border: none; padding: 1.5rem; font-family: 'Courier New', Courier, monospace; font-size: 14px; line-height: 1.6; background: #fafafa; color: #333; resize: none; outline: none; transition: background 0.3s;" onfocus="this.style.background='#ffffff'" onblur="this.style.background='#fafafa'"><?= htmlspecialchars($content) ?></textarea>
+            <textarea name="content" spellcheck="false" style="flex: 1; width: 100%; border: none; padding: 1.5rem; font-family: 'Courier New', Courier, monospace; font-size: 14px; line-height: 1.6; background: #151515; color: #ffffff; resize: none; outline: none; transition: background 0.3s;"><?= htmlspecialchars($content) ?></textarea>
             
         </form>
     </div>

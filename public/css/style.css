@@ -21,6 +21,8 @@
     padding: 0;
     box-sizing: border-box;
     font-family: 'Outfit', sans-serif;
+    user-select: none;
+    -webkit-user-select: none;
 }
 
 body {
@@ -119,7 +121,10 @@ label {
 
 input[type="text"],
 input[type="password"],
+textarea,
 select {
+    user-select: auto;
+    -webkit-user-select: auto;
     width: 100%;
     padding: 0.75rem 1rem;
     background: #ffffff;
