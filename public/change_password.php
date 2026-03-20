@@ -1,10 +1,9 @@
 <?php
-
 require_once dirname(__DIR__) . '/vendor/autoload.php';
 
 use App\Config\Database;
 use App\Auth;
-use App\FileManager;
+use App\UserManager;
 
 session_start();
 
@@ -16,33 +15,28 @@ if (!$auth->isLoggedIn()) {
     exit;
 }
 
-$userId = $auth->getCurrentUserId();
-$fileManager = new FileManager($userId);
-
-if (!isset($_GET['file']) || empty($_GET['file'])) {
-    header('Location: /dashboard.php');
-    exit;
-}
-
-$filename = $_GET['file'];
 $error = '';
+$success = '';
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['content'])) {
-    try {
-        $fileManager->updateFileContent($filename, $_POST['content']);
-        $successMsg = "Arquivo '$filename' editado com sucesso!";
-        header("Location: /dashboard.php?success=" . urlencode($successMsg));
-        exit;
-    } catch (Exception $e) {
-        $error = $e->getMessage();
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $currentPassword = $_POST['current_password'] ?? '';
+    $newPassword = $_POST['new_password'] ?? '';
+    $confirmPassword = $_POST['confirm_password'] ?? '';
+
+    if (empty($currentPassword) || empty($newPassword) || empty($confirmPassword)) {
+        $error = "Todos os campos são obrigatórios.";
+    } elseif ($newPassword !== $confirmPassword) {
+        $error = "A nova senha e a confirmação não coincidem.";
+    } else {
+        try {
+            $userManager = new UserManager($db);
+            $userId = $auth->getCurrentUserId();
+            $userManager->changePassword($userId, $currentPassword, $newPassword);
+            $success = "Senha alterada com sucesso!";
+        } catch (Exception $e) {
+            $error = $e->getMessage();
+        }
     }
-}
-
-try {
-    $content = $fileManager->getFileContent($filename);
-} catch (Exception $e) {
-    header("Location: /dashboard.php?error=" . urlencode("Erro ao abrir o arquivo: " . $e->getMessage()));
-    exit;
 }
 ?>
 <!DOCTYPE html>
@@ -50,7 +44,7 @@ try {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Editar <?= htmlspecialchars($filename) ?> - Web Storage</title>
+    <title>Mudar Senha - Web Storage</title>
     <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
@@ -80,32 +74,47 @@ try {
         </div>
     </nav>
 
-    <div class="container" style="max-width: 95%;">
-        <?php if ($error): ?>
-            <div class="alert alert-error" style="margin-top: 1rem;"><?= htmlspecialchars($error) ?></div>
-        <?php endif; ?>
-
-        <form action="/edit.php?file=<?= urlencode($filename) ?>" method="POST" style="background: #ffffff; border: 1px solid var(--border); border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); overflow: hidden; display: flex; flex-direction: column; height: 75vh; margin-top: 1rem;">
-            
-            <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1.5rem; background: var(--bg-base); border-bottom: 1px solid var(--border);">
-                <div style="display: flex; align-items: center; gap: 0.75rem;">
-                    <svg width="22" height="22" fill="none" stroke="var(--primary)" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                    <span style="font-weight: 600; color: var(--text-main); font-size: 1.05rem;"><?= htmlspecialchars($filename) ?></span>
-                </div>
-                
-                <div style="display: flex; gap: 0.5rem;">
-                    <a href="/dashboard.php" class="btn" style="background: rgba(0,0,0,0.05); color: var(--text-main); font-size: 0.85rem; padding: 0.5rem 1rem;">
-                        Cancelar
-                    </a>
-                    <button type="submit" class="btn btn-primary" style="font-size: 0.85rem; padding: 0.5rem 1.25rem;">
-                        Salvar Alterações
-                    </button>
-                </div>
+    <div class="auth-container">
+        <div class="auth-box glass-panel" style="background: #ffffff;">
+            <div style="text-align: center; margin-bottom: 2rem;">
+                <svg width="48" height="48" fill="none" stroke="var(--primary)" viewBox="0 0 24 24" style="margin-bottom: 1rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                <h2>Mudar Senha</h2>
+                <p style="color: var(--text-muted); margin-top: 0.5rem;">Crie uma nova senha segura.</p>
             </div>
 
-            <textarea name="content" spellcheck="false" style="flex: 1; width: 100%; border: none; padding: 1.5rem; font-family: 'Courier New', Courier, monospace; font-size: 14px; line-height: 1.6; background: #151515; color: #ffffff; resize: none; outline: none; transition: background 0.3s;"><?= htmlspecialchars($content) ?></textarea>
-            
-        </form>
+            <?php if ($error): ?>
+                <div class="alert alert-error"><?= htmlspecialchars($error) ?></div>
+            <?php endif; ?>
+            <?php if ($success): ?>
+                <div class="alert alert-success"><?= htmlspecialchars($success) ?></div>
+                <script>
+                    setTimeout(() => {
+                        window.location.href = '/dashboard.php';
+                    }, 2000);
+                </script>
+            <?php endif; ?>
+
+            <form method="POST" action="/change_password.php">
+                <div class="form-group">
+                    <label for="current_password">Senha Atual</label>
+                    <input type="password" id="current_password" name="current_password" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="new_password">Nova Senha</label>
+                    <input type="password" id="new_password" name="new_password" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="confirm_password">Confirmar Nova Senha</label>
+                    <input type="password" id="confirm_password" name="confirm_password" required>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-block" style="margin-top: 1rem;">
+                    Atualizar Senha
+                </button>
+            </form>
+        </div>
     </div>
 
     <script>

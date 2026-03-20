@@ -62,4 +62,14 @@ class UserManagerTest extends TestCase {
         $users = $this->userManager->listUsers();
         $this->assertCount(2, $users);
     }
+
+    public function testChangePassword() {
+        $id = $this->userManager->addUser('passwduser', 'oldpassword');
+        
+        $this->assertTrue($this->userManager->changePassword($id, 'oldpassword', 'newpassword'));
+        
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage("Senha atual incorreta.");
+        $this->userManager->changePassword($id, 'oldpassword', 'evennewerpassword');
+    }
 }

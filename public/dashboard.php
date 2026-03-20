@@ -129,7 +129,7 @@ function formatBytes($bytes, $precision = 2) {
 </head>
 <body>
     <nav class="navbar glass-panel" style="width: 100%; margin: 0; border-radius: 0; border-left: none; border-right: none; border-top: none; padding: 1rem 2rem;">
-        <h2 class="text-gradient">Web Storage</h2>
+        <a href="/dashboard.php" style="text-decoration: none;"><h2 class="text-gradient" style="margin: 0;">Web Storage</h2></a>
         <div class="nav-links" style="display: flex; align-items: center; gap: 1rem;">
             <?php if ($auth->isAdmin()): ?>
                 <a href="/admin.php" style="margin: 0;">Admin Panel</a>

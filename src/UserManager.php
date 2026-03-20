@@ -24,6 +24,24 @@ class UserManager {
         return (int) $this->db->lastInsertId();
     }
 
+    public function changePassword(int $userId, string $currentPassword, string $newPassword): bool {
+        $stmt = $this->db->prepare("SELECT password FROM users WHERE id = ?");
+        $stmt->execute([$userId]);
+        $user = $stmt->fetch();
+
+        if (!$user) {
+            throw new Exception("User not found.");
+        }
+
+        if (!password_verify($currentPassword, $user['password'])) {
+            throw new Exception("Senha atual incorreta.");
+        }
+
+        $hash = password_hash($newPassword, PASSWORD_DEFAULT);
+        $updateStmt = $this->db->prepare("UPDATE users SET password = ? WHERE id = ?");
+        return $updateStmt->execute([$hash, $userId]);
+    }
+
     public function removeUser(int $id): bool {
         // Find user first to prevent removing the last admin (logic simplified for now)
         $stmt = $this->db->prepare("DELETE FROM users WHERE id = ?");

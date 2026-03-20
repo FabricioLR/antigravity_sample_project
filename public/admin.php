@@ -74,7 +74,7 @@ $successMsg = $_GET['success'] ?? $success;
 </head>
 <body>
     <nav class="navbar glass-panel" style="margin: 1rem; border-radius: 12px;">
-        <h2 class="text-gradient">Web Storage Admin</h2>
+        <a href="/dashboard.php" style="text-decoration: none;"><h2 class="text-gradient">Web Storage Admin</h2></a>
         <div class="nav-links">
             <a href="/dashboard.php">Meus Arquivos</a>
             <a href="/admin.php" class="active">Admin Panel</a>
