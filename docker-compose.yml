@@ -14,9 +14,9 @@ services:
       - DB_CONNECTION=pgsql
       - DB_HOST=db
       - DB_PORT=5432
-      - DB_DATABASE=web_storage
-      - DB_USERNAME=admin
-      - DB_PASSWORD=secret
+      - DB_DATABASE=${DB_DATABASE:-web_storage}
+      - DB_USERNAME=${DB_USERNAME:-admin}
+      - DB_PASSWORD=${DB_PASSWORD:-secret}
     command: /bin/bash -c "mkdir -p /var/www/html/storage && chmod -R 777 /var/www/html/storage && php-fpm"
     depends_on:
       - db
@@ -39,9 +39,9 @@ services:
     container_name: web_storage_db
     restart: unless-stopped
     environment:
-      POSTGRES_DB: web_storage
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: secret
+      POSTGRES_DB: ${DB_DATABASE:-web_storage}
+      POSTGRES_USER: ${DB_USERNAME:-admin}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-secret}
     volumes:
       - default_postgres_data:/var/lib/postgresql/data
     ports:

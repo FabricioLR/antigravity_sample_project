@@ -200,6 +200,7 @@ select:focus {
     padding: 1rem;
     text-align: left;
     border-bottom: 1px solid var(--border);
+    white-space: nowrap;
 }
 
 .data-table th {
@@ -421,15 +422,6 @@ select:focus {
     }
     .navbar {
         padding: 1rem;
-    }
-    .nav-links {
-        width: 100%;
-        display: flex;
-        justify-content: center;
-    }
-    .nav-links a {
-        margin-left: 0.75rem;
-        margin-right: 0.75rem;
     }
     .page-header {
         flex-direction: column;

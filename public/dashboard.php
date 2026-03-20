@@ -227,7 +227,8 @@ function formatBytes($bytes, $precision = 2) {
                     <span class="selection-count" id="selectionCount">0 itens selecionados</span>
                 </div>
 
-                <table class="data-table file-explorer-table">
+                <div class="table-container">
+                    <table class="data-table file-explorer-table">
                     <thead>
                         <tr>
                             <th class="th-checkbox">
@@ -259,6 +260,7 @@ function formatBytes($bytes, $precision = 2) {
                         <?php endforeach; ?>
                     </tbody>
                 </table>
+                </div>
             <?php endif; ?>
         </div>
     </div>

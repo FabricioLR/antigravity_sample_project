@@ -1,2 +1,12 @@
-vendor
-storage/*
+/vendor/
+/.env
+/.idea/
+/.vscode/
+/node_modules/
+/*.log
+docker/nginx/logs/*
+.phpunit.result.cache
+
+# Ensure storage folder exists but ignore uploaded files
+/storage/*
+!/storage/.gitkeep

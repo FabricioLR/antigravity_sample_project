@@ -13,9 +13,9 @@ services:
       - DB_CONNECTION=pgsql
       - DB_HOST=db_test
       - DB_PORT=5432
-      - DB_DATABASE=web_storage_test
-      - DB_USERNAME=test_user
-      - DB_PASSWORD=test_pass
+      - DB_DATABASE=${TEST_DB_NAME:-web_storage_test}
+      - DB_USERNAME=${TEST_DB_USER:-test_user}
+      - DB_PASSWORD=${TEST_DB_PASS:-test_pass}
     depends_on:
       - db_test
 
@@ -23,8 +23,8 @@ services:
     image: postgres:15-alpine
     container_name: web_storage_db_test
     environment:
-      POSTGRES_DB: web_storage_test
-      POSTGRES_USER: test_user
-      POSTGRES_PASSWORD: test_pass
+      POSTGRES_DB: ${TEST_DB_NAME:-web_storage_test}
+      POSTGRES_USER: ${TEST_DB_USER:-test_user}
+      POSTGRES_PASSWORD: ${TEST_DB_PASS:-test_pass}
     # No volume mapping for persistence, ephemeral DB for tests purely
 
