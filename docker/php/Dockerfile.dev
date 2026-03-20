@@ -3,6 +3,8 @@ FROM php:8.3-fpm
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
     libpq-dev \
+    libonig-dev \
+    libicu-dev \
     git \
     unzip \
     libzip-dev \
@@ -10,7 +12,7 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Install PHP extensions
-RUN docker-php-ext-install pdo pdo_pgsql pgsql zip
+RUN docker-php-ext-install pdo pdo_pgsql pgsql zip mbstring intl
 
 # Install Xdebug for testing and development
 RUN pecl install xdebug \
