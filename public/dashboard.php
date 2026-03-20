@@ -55,6 +55,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     }
 }
 
+// Handle Rename
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'rename') {
+    $oldName = $_POST['old_name'] ?? '';
+    $newName = $_POST['new_name'] ?? '';
+    if (!empty($oldName) && !empty($newName)) {
+        try {
+            $renamed = $fileManager->renameFile($oldName, $newName);
+            $success = "Arquivo '$oldName' renomeado para '$renamed' com sucesso!";
+        } catch (Exception $e) {
+            $error = $e->getMessage();
+        }
+    } else {
+        $error = "Nome de arquivo inválido.";
+    }
+}
+
 // Handle File Deletion
 if (isset($_GET['action']) && $_GET['action'] === 'delete' && isset($_GET['file'])) {
     try {
@@ -175,7 +191,17 @@ function formatBytes($bytes, $precision = 2) {
                     <input type="hidden" name="files" id="bulkFilesInput" value="">
                 </form>
 
+                <!-- Rename Form -->
+                <form id="renameActionForm" method="POST" action="/dashboard.php" style="display: none;">
+                    <input type="hidden" name="action" value="rename">
+                    <input type="hidden" name="old_name" id="renameOldInput" value="">
+                    <input type="hidden" name="new_name" id="renameNewInput" value="">
+                </form>
+
                 <div class="action-bar-top glass-panel" style="display: flex; gap: 0.5rem; padding: 0.75rem 1rem; border-radius: 0; border-top: 0; border-left: 0; border-right: 0; align-items: center; border-bottom: 1px solid var(--border);">
+                    <button class="btn action-btn" id="btnRename" disabled style="background: rgba(255,255,255,0.05); color: var(--text-main); padding: 0.4rem 0.8rem; opacity: 0.5; cursor: not-allowed;" onclick="renameSelected()">
+                        Renomear
+                    </button>
                     <button class="btn btn-primary action-btn" id="btnEdit" disabled onclick="editSelected()" style="padding: 0.4rem 0.8rem; opacity: 0.5; cursor: not-allowed;">
                         <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg> Editar
                     </button>
@@ -242,6 +268,7 @@ function formatBytes($bytes, $precision = 2) {
             const count = checkboxes.length;
             document.getElementById('selectionCount').innerText = `${count} item${count !== 1 ? 'ns' : ''} selecionado${count !== 1 ? 's' : ''}`;
             
+            const btnRename = document.getElementById('btnRename');
             const btnEdit = document.getElementById('btnEdit');
             const btnDownload = document.getElementById('btnDownload');
             const btnDelete = document.getElementById('btnDelete');
@@ -251,6 +278,19 @@ function formatBytes($bytes, $precision = 2) {
                 const row = checkboxes[0].closest('tr');
                 if (row.getAttribute('data-editable') === 'true') {
                     canEdit = true;
+                }
+            }
+
+            // Ativa/Desativa Rename
+            if (btnRename) {
+                if (count === 1) {
+                    btnRename.disabled = false;
+                    btnRename.style.opacity = '1';
+                    btnRename.style.cursor = 'pointer';
+                } else {
+                    btnRename.disabled = true;
+                    btnRename.style.opacity = '0.5';
+                    btnRename.style.cursor = 'not-allowed';
                 }
             }
 
@@ -352,6 +392,19 @@ function formatBytes($bytes, $precision = 2) {
                 const isEditable = document.querySelector(`.file-checkbox:checked`).closest('tr').getAttribute('data-editable') === 'true';
                 if(isEditable) {
                     window.location.href = '/edit.php?file=' + encodeURIComponent(files[0]);
+                }
+            }
+        }
+
+        function renameSelected() {
+            const files = getSelectedFiles();
+            if (files.length === 1) {
+                const oldName = files[0];
+                const newName = prompt("Digite o novo nome para o arquivo:", oldName);
+                if (newName && newName !== oldName && newName.trim() !== '') {
+                    document.getElementById('renameOldInput').value = oldName;
+                    document.getElementById('renameNewInput').value = newName.trim();
+                    document.getElementById('renameActionForm').submit();
                 }
             }
         }

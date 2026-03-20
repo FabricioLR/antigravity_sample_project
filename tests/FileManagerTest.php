@@ -159,4 +159,34 @@ class FileManagerTest extends TestCase {
         $this->assertEquals(0, $result['success']);
         $this->assertEquals(1, $result['failed']);
     }
+
+    public function testRenameFile() {
+        $tmpFile = tempnam(sys_get_temp_dir(), 'test');
+        file_put_contents($tmpFile, 'dummy content');
+        
+        $this->fileManager->uploadFile([
+            'name' => 'torename.txt',
+            'tmp_name' => $tmpFile,
+            'error' => UPLOAD_ERR_OK
+        ]);
+        
+        $newName = $this->fileManager->renameFile('torename.txt', 'renamed.txt');
+        $this->assertEquals('renamed.txt', $newName);
+        
+        $files = $this->fileManager->listFiles();
+        $this->assertCount(1, $files);
+        $this->assertEquals('renamed.txt', $files[0]['name']);
+        
+        // test existing target
+        $tmpFile2 = tempnam(sys_get_temp_dir(), 'test');
+        file_put_contents($tmpFile2, 'dummy content');
+        $this->fileManager->uploadFile([
+            'name' => 'existing.txt',
+            'tmp_name' => $tmpFile2,
+            'error' => UPLOAD_ERR_OK
+        ]);
+        
+        $this->expectException(Exception::class);
+        $this->fileManager->renameFile('renamed.txt', 'existing.txt');
+    }
 }

@@ -106,6 +106,27 @@ class FileManager {
         return $results;
     }
 
+    public function renameFile(string $oldName, string $newName): string {
+        $oldPath = $this->getFilePath($oldName);
+        $newName = basename($newName);
+        $newName = preg_replace('/[^a-zA-Z0-9_\.-]/', '_', $newName);
+        
+        if (empty($newName)) {
+            throw new Exception("Invalid new filename.");
+        }
+        
+        $newPath = $this->getUserDirectory() . '/' . $newName;
+        if (file_exists($newPath)) {
+            throw new Exception("File with the new name already exists.");
+        }
+        
+        if (!rename($oldPath, $newPath)) {
+            throw new Exception("Failed to rename file.");
+        }
+        
+        return $newName;
+    }
+
     public function getFilePath(string $filename): string {
         $path = $this->getUserDirectory() . '/' . basename($filename);
         if (!file_exists($path) || !is_file($path)) {
