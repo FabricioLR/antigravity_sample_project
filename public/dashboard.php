@@ -199,16 +199,16 @@ function formatBytes($bytes, $precision = 2) {
                 </form>
 
                 <div class="action-bar-top glass-panel" id="topActionBar" style="display: flex; min-height: 60px; gap: 0.5rem; padding: 0.75rem 1rem; border-radius: 0; border-top: 0; border-left: 0; border-right: 0; align-items: center; border-bottom: 1px solid var(--border);">
-                    <button class="btn action-btn" id="btnRename" style="background: rgba(0,0,0,0.05); color: var(--text-main); padding: 0.4rem 0.8rem;" onclick="renameSelected()">
+                    <button class="btn action-btn" id="btnRename" style="display: none; background: rgba(0,0,0,0.05); color: var(--text-main); padding: 0.4rem 0.8rem;" onclick="renameSelected()">
                         Renomear
                     </button>
-                    <button class="btn btn-primary action-btn" id="btnEdit" onclick="editSelected()" style="padding: 0.4rem 0.8rem;">
+                    <button class="btn btn-primary action-btn" id="btnEdit" onclick="editSelected()" style="display: none; padding: 0.4rem 0.8rem;">
                         <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg> Editar
                     </button>
-                    <button class="btn action-btn" id="btnDownload" style="background: rgba(0,0,0,0.05); color: var(--text-main); padding: 0.4rem 0.8rem;" onclick="downloadSelected()">
+                    <button class="btn action-btn" id="btnDownload" style="display: none; background: rgba(0,0,0,0.05); color: var(--text-main); padding: 0.4rem 0.8rem;" onclick="downloadSelected()">
                         Baixar
                     </button>
-                    <button class="btn btn-danger action-btn" id="btnDelete" style="padding: 0.4rem 0.8rem;" onclick="deleteSelected()">
+                    <button class="btn btn-danger action-btn" id="btnDelete" style="display: none; padding: 0.4rem 0.8rem;" onclick="deleteSelected()">
                         Apagar
                     </button>
                     <span style="margin-left: auto; color: var(--text-muted); font-size: 0.9rem;" id="selectionCount">0 itens selecionados</span>
