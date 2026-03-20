@@ -96,15 +96,28 @@ function formatBytes($bytes, $precision = 2) {
     <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
-    <nav class="navbar glass-panel" style="margin: 1rem; border-radius: 12px;">
+    <nav class="navbar glass-panel" style="width: 100%; margin: 0; border-radius: 0; border-left: none; border-right: none; border-top: none; padding: 1rem 2rem;">
         <h2 class="text-gradient">Web Storage</h2>
-        <div class="nav-links">
-            <span style="color: var(--text-muted); margin-right: 1rem;">Olá, <?= htmlspecialchars($_SESSION['username']) ?></span>
-            <a href="/dashboard.php" class="active">Meus Arquivos</a>
+        <div class="nav-links" style="display: flex; align-items: center; gap: 1rem;">
             <?php if ($auth->isAdmin()): ?>
-                <a href="/admin.php">Admin Panel</a>
+                <a href="/admin.php" style="margin: 0;">Admin Panel</a>
             <?php endif; ?>
-            <a href="/dashboard.php?action=logout" class="btn-logout">Sair</a>
+            <div class="profile-dropdown" id="profileDropdown">
+                <div class="profile-icon" onclick="toggleDropdown()">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                </div>
+                <div class="dropdown-menu">
+                    <a href="/change_password.php" class="dropdown-item" style="margin: 0;">
+                        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path></svg>
+                        Mudar Senha
+                    </a>
+                    <div class="dropdown-divider"></div>
+                    <a href="/dashboard.php?action=logout" class="dropdown-item danger" style="margin: 0;">
+                        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                        Sair
+                    </a>
+                </div>
+            </div>
         </div>
     </nav>
 
@@ -182,5 +195,18 @@ function formatBytes($bytes, $precision = 2) {
             <?php endif; ?>
         </div>
     </div>
+    <script>
+        function toggleDropdown() {
+            document.getElementById('profileDropdown').classList.toggle('active');
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            const dropdown = document.getElementById('profileDropdown');
+            if (dropdown && !dropdown.contains(event.target)) {
+                dropdown.classList.remove('active');
+            }
+        });
+    </script>
 </body>
 </html>
