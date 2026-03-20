@@ -198,7 +198,7 @@ function formatBytes($bytes, $precision = 2) {
                     <input type="hidden" name="new_name" id="renameNewInput" value="">
                 </form>
 
-                <div class="action-bar-top glass-panel" id="topActionBar" style="display: none; gap: 0.5rem; padding: 0.75rem 1rem; border-radius: 0; border-top: 0; border-left: 0; border-right: 0; align-items: center; border-bottom: 1px solid var(--border);">
+                <div class="action-bar-top glass-panel" id="topActionBar" style="display: flex; min-height: 60px; gap: 0.5rem; padding: 0.75rem 1rem; border-radius: 0; border-top: 0; border-left: 0; border-right: 0; align-items: center; border-bottom: 1px solid var(--border);">
                     <button class="btn action-btn" id="btnRename" style="background: rgba(0,0,0,0.05); color: var(--text-main); padding: 0.4rem 0.8rem;" onclick="renameSelected()">
                         Renomear
                     </button>
@@ -283,10 +283,11 @@ function formatBytes($bytes, $precision = 2) {
             }
 
             if (count === 0) {
-                if (topActionBar) topActionBar.style.display = 'none';
+                if (btnRename) btnRename.style.display = 'none';
+                if (btnEdit) btnEdit.style.display = 'none';
+                if (btnDownload) btnDownload.style.display = 'none';
+                if (btnDelete) btnDelete.style.display = 'none';
             } else {
-                if (topActionBar) topActionBar.style.display = 'flex';
-
                 if (btnRename) {
                     btnRename.style.display = (count === 1) ? 'inline-flex' : 'none';
                     btnRename.disabled = false;
