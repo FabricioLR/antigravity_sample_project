@@ -122,7 +122,7 @@ $successMsg = $_GET['success'] ?? $success;
                                     <?php endif; ?>
                                 </td>
                                 <td>
-                                    <span style="font-size: 0.8rem; padding: 0.2rem 0.5rem; border-radius: 4px; background: rgba(255,255,255,0.1); color: var(--text-muted);">
+                                    <span style="font-size: 0.8rem; padding: 0.2rem 0.5rem; border-radius: 4px; background: rgba(0,0,0,0.06); color: var(--text-muted);">
                                         <?= strtoupper(htmlspecialchars($user['role'])) ?>
                                     </span>
                                 </td>

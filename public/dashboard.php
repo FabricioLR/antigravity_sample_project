@@ -199,13 +199,13 @@ function formatBytes($bytes, $precision = 2) {
                 </form>
 
                 <div class="action-bar-top glass-panel" style="display: flex; gap: 0.5rem; padding: 0.75rem 1rem; border-radius: 0; border-top: 0; border-left: 0; border-right: 0; align-items: center; border-bottom: 1px solid var(--border);">
-                    <button class="btn action-btn" id="btnRename" disabled style="background: rgba(255,255,255,0.05); color: var(--text-main); padding: 0.4rem 0.8rem; opacity: 0.5; cursor: not-allowed;" onclick="renameSelected()">
+                    <button class="btn action-btn" id="btnRename" disabled style="background: rgba(0,0,0,0.05); color: var(--text-main); padding: 0.4rem 0.8rem; opacity: 0.5; cursor: not-allowed;" onclick="renameSelected()">
                         Renomear
                     </button>
                     <button class="btn btn-primary action-btn" id="btnEdit" disabled onclick="editSelected()" style="padding: 0.4rem 0.8rem; opacity: 0.5; cursor: not-allowed;">
                         <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg> Editar
                     </button>
-                    <button class="btn action-btn" id="btnDownload" disabled style="background: rgba(255,255,255,0.05); color: var(--text-main); padding: 0.4rem 0.8rem; opacity: 0.5; cursor: not-allowed;" onclick="downloadSelected()">
+                    <button class="btn action-btn" id="btnDownload" disabled style="background: rgba(0,0,0,0.05); color: var(--text-main); padding: 0.4rem 0.8rem; opacity: 0.5; cursor: not-allowed;" onclick="downloadSelected()">
                         Baixar
                     </button>
                     <button class="btn btn-danger action-btn" id="btnDelete" disabled style="padding: 0.4rem 0.8rem; opacity: 0.5; cursor: not-allowed;" onclick="deleteSelected()">

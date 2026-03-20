@@ -63,9 +63,9 @@ try {
             flex-grow: 1;
             width: 100%;
             padding: 1rem;
-            background: rgba(0, 0, 0, 0.4);
+            background: rgba(0, 0, 0, 0.85); /* kept dark editor but darker */
             color: #f8f8f2;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(0, 0, 0, 0.1);
             border-radius: 8px;
             font-family: 'Courier New', Courier, monospace;
             font-size: 14px;
@@ -96,7 +96,7 @@ try {
             <div>
                 <h1>Editar Arquivo: <span style="color: var(--primary-color);"><?= htmlspecialchars($filename) ?></span></h1>
             </div>
-            <a href="/dashboard.php" class="btn" style="background: rgba(255,255,255,0.1); color: var(--text-main);">
+            <a href="/dashboard.php" class="btn" style="background: rgba(0,0,0,0.06); color: var(--text-main);">
                 Voltar
             </a>
         </div>

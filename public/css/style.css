@@ -1,19 +1,19 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
 
 :root {
-    --primary: #6366f1;
-    --primary-hover: #4f46e5;
-    --secondary: #ec4899;
-    --bg-base: #0f172a;
-    --bg-surface: rgba(30, 41, 59, 0.7);
-    --bg-surface-hover: rgba(30, 41, 59, 0.9);
-    --text-main: #f8fafc;
-    --text-muted: #94a3b8;
-    --border: rgba(255, 255, 255, 0.1);
+    --primary: #3b82f6;
+    --primary-hover: #2563eb;
+    --secondary: #60a5fa;
+    --bg-base: #f1f5f9;
+    --bg-surface: rgba(255, 255, 255, 0.9);
+    --bg-surface-hover: rgba(255, 255, 255, 1);
+    --text-main: #0f172a;
+    --text-muted: #64748b;
+    --border: rgba(0, 0, 0, 0.1);
     --danger: #ef4444;
     --success: #10b981;
     --glass-blur: blur(12px);
-    --shadow-glow: 0 0 20px rgba(99, 102, 241, 0.2);
+    --shadow-glow: 0 4px 14px rgba(59, 130, 246, 0.2);
 }
 
 * {
@@ -29,10 +29,6 @@ body {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
-    background-image: 
-        radial-gradient(circle at 15% 50%, rgba(99, 102, 241, 0.15), transparent 25%),
-        radial-gradient(circle at 85% 30%, rgba(236, 72, 153, 0.15), transparent 25%);
-    background-attachment: fixed;
 }
 
 /* Glassmorphism Classes */
@@ -52,10 +48,8 @@ h1, h2, h3 {
 }
 
 .text-gradient {
-    background: linear-gradient(135deg, var(--primary), var(--secondary));
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
+    color: var(--primary);
+    font-weight: 700;
 }
 
 /* Layout */
@@ -128,7 +122,7 @@ input[type="password"],
 select {
     width: 100%;
     padding: 0.75rem 1rem;
-    background: rgba(15, 23, 42, 0.5);
+    background: #ffffff;
     border: 1px solid var(--border);
     border-radius: 8px;
     color: var(--text-main);
@@ -214,7 +208,7 @@ select:focus {
 }
 
 .data-table tbody tr:hover {
-    background-color: rgba(255, 255, 255, 0.02);
+    background-color: rgba(0, 0, 0, 0.02);
 }
 
 .empty-state {
@@ -361,7 +355,7 @@ select:focus {
 }
 
 .dropdown-item:hover {
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(0, 0, 0, 0.04);
 }
 
 .dropdown-divider {
@@ -391,7 +385,7 @@ select:focus {
 }
 
 .file-row:hover {
-    background-color: rgba(255, 255, 255, 0.05);
+    background-color: rgba(0, 0, 0, 0.03);
 }
 
 .file-row.selected {
