@@ -198,17 +198,17 @@ function formatBytes($bytes, $precision = 2) {
                     <input type="hidden" name="new_name" id="renameNewInput" value="">
                 </form>
 
-                <div class="action-bar-top glass-panel" style="display: flex; gap: 0.5rem; padding: 0.75rem 1rem; border-radius: 0; border-top: 0; border-left: 0; border-right: 0; align-items: center; border-bottom: 1px solid var(--border);">
-                    <button class="btn action-btn" id="btnRename" disabled style="background: rgba(0,0,0,0.05); color: var(--text-main); padding: 0.4rem 0.8rem; opacity: 0.5; cursor: not-allowed;" onclick="renameSelected()">
+                <div class="action-bar-top glass-panel" id="topActionBar" style="display: none; gap: 0.5rem; padding: 0.75rem 1rem; border-radius: 0; border-top: 0; border-left: 0; border-right: 0; align-items: center; border-bottom: 1px solid var(--border);">
+                    <button class="btn action-btn" id="btnRename" style="background: rgba(0,0,0,0.05); color: var(--text-main); padding: 0.4rem 0.8rem;" onclick="renameSelected()">
                         Renomear
                     </button>
-                    <button class="btn btn-primary action-btn" id="btnEdit" disabled onclick="editSelected()" style="padding: 0.4rem 0.8rem; opacity: 0.5; cursor: not-allowed;">
+                    <button class="btn btn-primary action-btn" id="btnEdit" onclick="editSelected()" style="padding: 0.4rem 0.8rem;">
                         <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg> Editar
                     </button>
-                    <button class="btn action-btn" id="btnDownload" disabled style="background: rgba(0,0,0,0.05); color: var(--text-main); padding: 0.4rem 0.8rem; opacity: 0.5; cursor: not-allowed;" onclick="downloadSelected()">
+                    <button class="btn action-btn" id="btnDownload" style="background: rgba(0,0,0,0.05); color: var(--text-main); padding: 0.4rem 0.8rem;" onclick="downloadSelected()">
                         Baixar
                     </button>
-                    <button class="btn btn-danger action-btn" id="btnDelete" disabled style="padding: 0.4rem 0.8rem; opacity: 0.5; cursor: not-allowed;" onclick="deleteSelected()">
+                    <button class="btn btn-danger action-btn" id="btnDelete" style="padding: 0.4rem 0.8rem;" onclick="deleteSelected()">
                         Apagar
                     </button>
                     <span style="margin-left: auto; color: var(--text-muted); font-size: 0.9rem;" id="selectionCount">0 itens selecionados</span>
@@ -268,6 +268,7 @@ function formatBytes($bytes, $precision = 2) {
             const count = checkboxes.length;
             document.getElementById('selectionCount').innerText = `${count} item${count !== 1 ? 'ns' : ''} selecionado${count !== 1 ? 's' : ''}`;
             
+            const topActionBar = document.getElementById('topActionBar');
             const btnRename = document.getElementById('btnRename');
             const btnEdit = document.getElementById('btnEdit');
             const btnDownload = document.getElementById('btnDownload');
@@ -281,43 +282,31 @@ function formatBytes($bytes, $precision = 2) {
                 }
             }
 
-            // Ativa/Desativa Rename
-            if (btnRename) {
-                if (count === 1) {
+            if (count === 0) {
+                if (topActionBar) topActionBar.style.display = 'none';
+            } else {
+                if (topActionBar) topActionBar.style.display = 'flex';
+
+                if (btnRename) {
+                    btnRename.style.display = (count === 1) ? 'inline-flex' : 'none';
                     btnRename.disabled = false;
-                    btnRename.style.opacity = '1';
-                    btnRename.style.cursor = 'pointer';
-                } else {
-                    btnRename.disabled = true;
-                    btnRename.style.opacity = '0.5';
-                    btnRename.style.cursor = 'not-allowed';
+                }
+
+                if (btnEdit) {
+                    btnEdit.style.display = canEdit ? 'inline-flex' : 'none';
+                    btnEdit.disabled = false;
+                }
+
+                if (btnDownload) {
+                    btnDownload.style.display = 'inline-flex';
+                    btnDownload.disabled = false;
+                }
+
+                if (btnDelete) {
+                    btnDelete.style.display = 'inline-flex';
+                    btnDelete.disabled = false;
                 }
             }
-
-            // Ativa/Desativa Edit
-            if (canEdit && btnEdit) {
-                btnEdit.disabled = false;
-                btnEdit.style.opacity = '1';
-                btnEdit.style.cursor = 'pointer';
-            } else if (btnEdit) {
-                btnEdit.disabled = true;
-                btnEdit.style.opacity = '0.5';
-                btnEdit.style.cursor = 'not-allowed';
-            }
-
-            // Ativa/Desativa Bulk
-            [btnDownload, btnDelete].forEach(btn => {
-                if(!btn) return;
-                if (count > 0) {
-                    btn.disabled = false;
-                    btn.style.opacity = '1';
-                    btn.style.cursor = 'pointer';
-                } else {
-                    btn.disabled = true;
-                    btn.style.opacity = '0.5';
-                    btn.style.cursor = 'not-allowed';
-                }
-            });
         }
 
         function toggleFileRow(row, event) {
