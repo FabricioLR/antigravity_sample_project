@@ -10,3 +10,4 @@ docker/nginx/logs/*
 # Ensure storage folder exists but ignore uploaded files
 /storage/*
 !/storage/.gitkeep
+/.phpunit.cache/
