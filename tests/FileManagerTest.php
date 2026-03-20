@@ -127,4 +127,36 @@ class FileManagerTest extends TestCase {
         $contentAfter = $this->fileManager->getFileContent('editor_test.txt');
         $this->assertEquals('modified text', $contentAfter);
     }
+
+    public function testBulkDelete() {
+        $tmpFile1 = tempnam(sys_get_temp_dir(), 'test1');
+        file_put_contents($tmpFile1, 'dummy content 1');
+        
+        $this->fileManager->uploadFile([
+            'name' => 'bulk1.txt',
+            'tmp_name' => $tmpFile1,
+            'error' => UPLOAD_ERR_OK
+        ]);
+
+        $tmpFile2 = tempnam(sys_get_temp_dir(), 'test2');
+        file_put_contents($tmpFile2, 'dummy content 2');
+        
+        $this->fileManager->uploadFile([
+            'name' => 'bulk2.txt',
+            'tmp_name' => $tmpFile2,
+            'error' => UPLOAD_ERR_OK
+        ]);
+
+        $this->assertCount(2, $this->fileManager->listFiles());
+        
+        $result = $this->fileManager->bulkDelete(['bulk1.txt', 'bulk2.txt']);
+        $this->assertEquals(2, $result['success']);
+        $this->assertEquals(0, $result['failed']);
+        $this->assertCount(0, $this->fileManager->listFiles());
+        
+        // Test with non-existent file
+        $result = $this->fileManager->bulkDelete(['nonexistent.txt']);
+        $this->assertEquals(0, $result['success']);
+        $this->assertEquals(1, $result['failed']);
+    }
 }

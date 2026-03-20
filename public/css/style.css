@@ -54,6 +54,7 @@ h1, h2, h3 {
 .text-gradient {
     background: linear-gradient(135deg, var(--primary), var(--secondary));
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
 }
 
@@ -375,4 +376,28 @@ select:focus {
 
 .dropdown-item.danger:hover {
     background: rgba(239, 68, 68, 0.1);
+}
+
+/* File Explorer Styles */
+.file-explorer-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.file-row {
+    cursor: pointer;
+    transition: background-color 0.2s;
+    user-select: none;
+}
+
+.file-row:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.file-row.selected {
+    background-color: rgba(99, 102, 241, 0.15) !important;
+}
+
+.file-row.selected:hover {
+    background-color: rgba(99, 102, 241, 0.25) !important;
 }

@@ -91,6 +91,21 @@ class FileManager {
         throw new Exception("File not found.");
     }
 
+    public function bulkDelete(array $filenames): array {
+        $results = ['success' => 0, 'failed' => 0, 'errors' => []];
+        foreach ($filenames as $filename) {
+            try {
+                if ($this->deleteFile($filename)) {
+                    $results['success']++;
+                }
+            } catch (Exception $e) {
+                $results['failed']++;
+                $results['errors'][$filename] = $e->getMessage();
+            }
+        }
+        return $results;
+    }
+
     public function getFilePath(string $filename): string {
         $path = $this->getUserDirectory() . '/' . basename($filename);
         if (!file_exists($path) || !is_file($path)) {

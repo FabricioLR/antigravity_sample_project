@@ -39,6 +39,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['file'])) {
     }
 }
 
+// Handle Bulk Deletion
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'bulk_delete' && isset($_POST['files'])) {
+    try {
+        $filesToDelete = json_decode($_POST['files'], true);
+        if (is_array($filesToDelete) && !empty($filesToDelete)) {
+            $result = $fileManager->bulkDelete($filesToDelete);
+            $success = $result['success'] . " arquivo(s) apagado(s) com sucesso.";
+            if ($result['failed'] > 0) {
+                $error .= $result['failed'] . " arquivo(s) falharam em ser apagados. ";
+            }
+        }
+    } catch (Exception $e) {
+        $error = $e->getMessage();
+    }
+}
+
 // Handle File Deletion
 if (isset($_GET['action']) && $_GET['action'] === 'delete' && isset($_GET['file'])) {
     try {
@@ -153,41 +169,53 @@ function formatBytes($bytes, $precision = 2) {
                     <p style="margin-top: 0.5rem;">Faça upload do seu primeiro arquivo para começar.</p>
                 </div>
             <?php else: ?>
-                <table class="data-table">
+                <!-- Bulk Delete Form -->
+                <form id="bulkActionForm" method="POST" action="/dashboard.php" style="display: none;">
+                    <input type="hidden" name="action" value="bulk_delete">
+                    <input type="hidden" name="files" id="bulkFilesInput" value="">
+                </form>
+
+                <div class="action-bar-top glass-panel" style="display: flex; gap: 0.5rem; padding: 0.75rem 1rem; border-radius: 0; border-top: 0; border-left: 0; border-right: 0; align-items: center; border-bottom: 1px solid var(--border);">
+                    <button class="btn btn-primary action-btn" id="btnEdit" disabled onclick="editSelected()" style="padding: 0.4rem 0.8rem; opacity: 0.5; cursor: not-allowed;">
+                        <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg> Editar
+                    </button>
+                    <button class="btn action-btn" id="btnDownload" disabled style="background: rgba(255,255,255,0.05); color: var(--text-main); padding: 0.4rem 0.8rem; opacity: 0.5; cursor: not-allowed;" onclick="downloadSelected()">
+                        Baixar
+                    </button>
+                    <button class="btn btn-danger action-btn" id="btnDelete" disabled style="padding: 0.4rem 0.8rem; opacity: 0.5; cursor: not-allowed;" onclick="deleteSelected()">
+                        Apagar
+                    </button>
+                    <span style="margin-left: auto; color: var(--text-muted); font-size: 0.9rem;" id="selectionCount">0 itens selecionados</span>
+                </div>
+
+                <table class="data-table file-explorer-table">
                     <thead>
                         <tr>
-                            <th>Nome do Arquivo</th>
+                            <th style="width: 40px; text-align: center;">
+                                <input type="checkbox" id="selectAllCheckbox" onclick="toggleAllFiles(this)" style="cursor: pointer;">
+                            </th>
+                            <th>Nome</th>
                             <th>Tamanho</th>
-                            <th>Modificado Em</th>
-                            <th style="text-align: right;">Ações</th>
+                            <th>Modificado em</th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php foreach ($files as $file): ?>
-                            <tr>
-                                <td style="font-weight: 500;">
-                                    <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="vertical-align: sub; margin-right: 0.5rem; color: var(--text-muted);"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
-                                    <?= htmlspecialchars($file['name']) ?>
+                            <?php 
+                            $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+                            $textExtensions = ['txt', 'json', 'md', 'csv', 'log', 'xml', 'yml', 'yaml', 'php', 'html', 'css', 'js'];
+                            $isEditable = in_array($ext, $textExtensions) ? 'true' : 'false';
+                            ?>
+                            <tr class="file-row" onclick="toggleFileRow(this, event)" data-filename="<?= htmlspecialchars($file['name']) ?>" data-editable="<?= $isEditable ?>">
+                                <td style="text-align: center;">
+                                    <input type="checkbox" class="file-checkbox" onclick="toggleFileCheckbox(this, event)" style="cursor: pointer;">
+                                </td>
+                                <td style="font-weight: 500; display: flex; align-items: center; gap: 0.5rem; border: none;">
+                                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: var(--text-muted);"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+                                    <span class="file-name"><?= htmlspecialchars($file['name']) ?></span>
                                 </td>
                                 <td><?= formatBytes($file['size']) ?></td>
                                 <td><?= date('d/m/Y H:i', $file['modified']) ?></td>
-                                <td style="text-align: right; display: flex; justify-content: flex-end; gap: 0.5rem;">
-                                    <?php 
-                                    $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
-                                    $textExtensions = ['txt', 'json', 'md', 'csv', 'log', 'xml', 'yml', 'yaml', 'php', 'html', 'css', 'js'];
-                                    if (in_array($ext, $textExtensions)): 
-                                    ?>
-                                    <a href="/edit.php?file=<?= urlencode($file['name']) ?>" class="btn btn-primary" style="padding: 0.4rem 0.8rem;">
-                                        <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="vertical-align: sub;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg> Editar
-                                    </a>
-                                    <?php endif; ?>
-                                    <a href="/dashboard.php?action=download&file=<?= urlencode($file['name']) ?>" class="btn" style="background: rgba(255,255,255,0.1); color: var(--text-main); padding: 0.4rem 0.8rem;">
-                                        Baixar
-                                    </a>
-                                    <a href="/dashboard.php?action=delete&file=<?= urlencode($file['name']) ?>" class="btn btn-danger" style="padding: 0.4rem 0.8rem;" onclick="return confirm('Tem certeza que deseja apagar este arquivo?');">
-                                        Apagar
-                                    </a>
-                                </td>
                             </tr>
                         <?php endforeach; ?>
                     </tbody>
@@ -207,6 +235,152 @@ function formatBytes($bytes, $precision = 2) {
                 dropdown.classList.remove('active');
             }
         });
+
+        // File Explorer Selection Logic
+        function updateActionBar() {
+            const checkboxes = document.querySelectorAll('.file-checkbox:checked');
+            const count = checkboxes.length;
+            document.getElementById('selectionCount').innerText = `${count} item${count !== 1 ? 'ns' : ''} selecionado${count !== 1 ? 's' : ''}`;
+            
+            const btnEdit = document.getElementById('btnEdit');
+            const btnDownload = document.getElementById('btnDownload');
+            const btnDelete = document.getElementById('btnDelete');
+
+            let canEdit = false;
+            if (count === 1) {
+                const row = checkboxes[0].closest('tr');
+                if (row.getAttribute('data-editable') === 'true') {
+                    canEdit = true;
+                }
+            }
+
+            // Ativa/Desativa Edit
+            if (canEdit && btnEdit) {
+                btnEdit.disabled = false;
+                btnEdit.style.opacity = '1';
+                btnEdit.style.cursor = 'pointer';
+            } else if (btnEdit) {
+                btnEdit.disabled = true;
+                btnEdit.style.opacity = '0.5';
+                btnEdit.style.cursor = 'not-allowed';
+            }
+
+            // Ativa/Desativa Bulk
+            [btnDownload, btnDelete].forEach(btn => {
+                if(!btn) return;
+                if (count > 0) {
+                    btn.disabled = false;
+                    btn.style.opacity = '1';
+                    btn.style.cursor = 'pointer';
+                } else {
+                    btn.disabled = true;
+                    btn.style.opacity = '0.5';
+                    btn.style.cursor = 'not-allowed';
+                }
+            });
+        }
+
+        function toggleFileRow(row, event) {
+            if (event.target.tagName.toLowerCase() === 'input') return;
+            const checkbox = row.querySelector('.file-checkbox');
+            checkbox.checked = !checkbox.checked;
+            if (checkbox.checked) {
+                row.classList.add('selected');
+            } else {
+                row.classList.remove('selected');
+            }
+            updateSelectAllState();
+            updateActionBar();
+        }
+
+        function toggleFileCheckbox(checkbox, event) {
+            event.stopPropagation();
+            const row = checkbox.closest('tr');
+            if (checkbox.checked) {
+                row.classList.add('selected');
+            } else {
+                row.classList.remove('selected');
+            }
+            updateSelectAllState();
+            updateActionBar();
+        }
+
+        function toggleAllFiles(mainCheckbox) {
+            const checkboxes = document.querySelectorAll('.file-checkbox');
+            checkboxes.forEach(cb => {
+                cb.checked = mainCheckbox.checked;
+                const row = cb.closest('tr');
+                if (cb.checked) {
+                    row.classList.add('selected');
+                } else {
+                    row.classList.remove('selected');
+                }
+            });
+            updateActionBar();
+        }
+
+        function updateSelectAllState() {
+            const mainCheckbox = document.getElementById('selectAllCheckbox');
+            if(!mainCheckbox) return;
+            const checkboxes = document.querySelectorAll('.file-checkbox');
+            const checkedBoxes = document.querySelectorAll('.file-checkbox:checked');
+            if (checkboxes.length === 0) {
+                mainCheckbox.checked = false;
+                mainCheckbox.indeterminate = false;
+            } else if (checkedBoxes.length === checkboxes.length) {
+                mainCheckbox.checked = true;
+                mainCheckbox.indeterminate = false;
+            } else if (checkedBoxes.length > 0) {
+                mainCheckbox.checked = false;
+                mainCheckbox.indeterminate = true;
+            } else {
+                mainCheckbox.checked = false;
+                mainCheckbox.indeterminate = false;
+            }
+        }
+
+        // Actions
+        function getSelectedFiles() {
+            return Array.from(document.querySelectorAll('.file-checkbox:checked')).map(cb => {
+                return cb.closest('tr').getAttribute('data-filename');
+            });
+        }
+
+        function editSelected() {
+            const files = getSelectedFiles();
+            if (files.length === 1) {
+                const isEditable = document.querySelector(`.file-checkbox:checked`).closest('tr').getAttribute('data-editable') === 'true';
+                if(isEditable) {
+                    window.location.href = '/edit.php?file=' + encodeURIComponent(files[0]);
+                }
+            }
+        }
+
+        function downloadSelected() {
+            const files = getSelectedFiles();
+            files.forEach((file, index) => {
+                setTimeout(() => {
+                    const a = document.createElement('a');
+                    a.href = '/dashboard.php?action=download&file=' + encodeURIComponent(file);
+                    // Força a exibição mínima para trigger correto de evento
+                    a.style.display = 'none';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                }, index * 400); // delay para prevenir bloqueio por múltiplas requisições
+            });
+        }
+
+        function deleteSelected() {
+            const files = getSelectedFiles();
+            if (files.length === 0) return;
+            
+            const countText = files.length === 1 ? 'este arquivo' : `estes ${files.length} arquivos`;
+            if (confirm(`Tem certeza que deseja apagar ${countText}? Esta ação é irreversível.`)) {
+                document.getElementById('bulkFilesInput').value = JSON.stringify(files);
+                document.getElementById('bulkActionForm').submit();
+            }
+        }
     </script>
 </body>
 </html>
