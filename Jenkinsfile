@@ -7,9 +7,6 @@ pipeline {
 
     stages {
         stage('Testes Automatizados') {
-            when {
-                branch 'master'
-            }
             steps {
                 script {
                     echo 'Criando rede isolada e subindo banco de teste nativo (sem compose)...'
@@ -34,9 +31,6 @@ pipeline {
         }
 
         stage('Build Imagens de Produção') {
-            when {
-                branch 'master'
-            }
             steps {
                 script {
                     echo 'Build das imagens refatorado para Docker DSL puro...'
@@ -47,9 +41,6 @@ pipeline {
         }
 
         stage('Deploy em Produção') {
-            when {
-                branch 'master'
-            }
             steps {
                 script {
                     echo 'Realizando deploy usando containers independentes via shell puro...'
