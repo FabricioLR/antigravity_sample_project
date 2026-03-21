@@ -1,20 +1,25 @@
 #!/bin/bash
 set -e
 
+DC="docker compose"
+if ! docker compose version >/dev/null 2>&1; then
+    DC="docker-compose"
+fi
+
 echo "Building test containers (Isso pode demorar alguns minutos e ser silencioso pois o C++ está compilando os drivers do PHP 8.4 pela primeira vez)..."
-docker compose -f docker-compose.test.yml build -q
+$DC -f docker-compose.test.yml build -q
 
 echo "Starting test database..."
-docker compose -f docker-compose.test.yml up -d db_test
+$DC -f docker-compose.test.yml up -d db_test
 
 echo "Waiting for database to be ready..."
 sleep 15
 
 echo "Installing composer dependencies..."
-docker compose -f docker-compose.test.yml run --rm app composer install -q
+$DC -f docker-compose.test.yml run --rm app composer install -q
 
 echo "Running PHPUnit tests..."
-docker compose -f docker-compose.test.yml run --rm app vendor/bin/phpunit --colors=always
+$DC -f docker-compose.test.yml run --rm app vendor/bin/phpunit --colors=always
 
 echo "Limpando Containers de Teste..."
-docker compose -f docker-compose.test.yml down -v
+$DC -f docker-compose.test.yml down -v

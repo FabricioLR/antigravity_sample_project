@@ -9,15 +9,7 @@ pipeline {
     stages {
         stage('Testes Automatizados') {
             when {
-                branch 'main'
-            }
-            agent {
-                // Docker in Docker (DinD): Container privilegiado roda o seu próprio daemon docker
-                docker {
-                    image 'docker:dind'
-                    args '--privileged'
-                    reuseNode true
-                }
+                branch 'master'
             }
             steps {
                 echo 'Executando testes automatizados do Web Storage...'
@@ -28,15 +20,7 @@ pipeline {
 
         stage('Deploy em Produção') {
             when {
-                branch 'main'
-            }
-            agent {
-                // Utilizando a estrutura de Docker in Docker para o Deploy
-                docker {
-                    image 'docker:dind'
-                    args '--privileged'
-                    reuseNode true
-                }
+                branch 'master'
             }
             steps {
                 echo 'Testes aprovados! Realizando deploy da imagem de produção...'
@@ -47,7 +31,7 @@ pipeline {
                     sh 'cp $PROD_ENV_FILE .env'
                     
                     // Deploy de produção utilizando o template específico
-                    sh 'docker compose -f docker-compose.prod.yml up --build -d'
+                    sh 'docker compose -f docker-compose.prod.yml up --build -d || docker-compose -f docker-compose.prod.yml up --build -d'
                 }
             }
         }
@@ -56,7 +40,7 @@ pipeline {
     post {
         always {
             // Garante uma limpeza passiva dos containers de teste residuais
-            sh 'docker compose -f docker-compose.test.yml down -v || true'
+            sh 'docker compose -f docker-compose.test.yml down -v || docker-compose -f docker-compose.test.yml down -v || true'
             
             // Apaga todos os arquivos do workspace antes de encerrar
             cleanWs()
