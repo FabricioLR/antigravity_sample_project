@@ -20,6 +20,8 @@ services:
     command: /bin/bash -c "mkdir -p /var/www/html/storage && chmod -R 777 /var/www/html/storage && php-fpm"
     depends_on:
       - db
+    networks:
+      - dev_net
 
 
   web:
@@ -33,6 +35,8 @@ services:
       - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
     depends_on:
       - app
+    networks:
+      - dev_net
 
   db:
     image: postgres:15-alpine
@@ -46,6 +50,12 @@ services:
       - default_postgres_data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
+    networks:
+      - dev_net
 
 volumes:
   default_postgres_data:
+
+networks:
+  dev_net:
+    driver: bridge

@@ -9,39 +9,48 @@ services:
     restart: always
     environment:
       - DB_CONNECTION=pgsql
-      - DB_HOST=db_prod
+      - DB_HOST=${PROD_DB_HOST:-10.0.0.110}
       - DB_PORT=5432
       - DB_DATABASE=${PROD_DB_NAME:-web_storage_prod}
       - DB_USERNAME=${PROD_DB_USER:-admin}
       - DB_PASSWORD=${PROD_DB_PASS:-secret_prod}
-    depends_on:
-      - db_prod
+#    depends_on:
+#      - db_prod
     volumes:
       - prod_storage:/var/www/html/storage  # Persist storage, isolate code
+    networks:
+      - prod_net
 
   web:
-    image: nginx:alpine
+    image: nginx:latest
     container_name: web_storage_nginx_prod
     restart: always
     ports:
-      - "80:80"
+      - "1234:1234"
     volumes:
       - ./public:/var/www/html/public:ro # Read-only public files
-      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./docker/nginx/prod.conf:/etc/nginx/conf.d/default.conf:ro
+      - /etc/letsencrypt/archive/server1.fabriciolr.online:/etc/nginx/cert:ro
     depends_on:
       - app
+    networks:
+      - prod_net
 
-  db_prod:
-    image: postgres:15-alpine
-    container_name: web_storage_db_prod
-    restart: always
-    environment:
-      POSTGRES_DB: ${PROD_DB_NAME:-web_storage_prod}
-      POSTGRES_USER: ${PROD_DB_USER:-admin}
-      POSTGRES_PASSWORD: ${PROD_DB_PASS:-secret_prod}
-    volumes:
-      - prod_postgres_data:/var/lib/postgresql/data
+#  db_prod:
+#    image: postgres:15-alpine
+#    container_name: web_storage_db_prod
+#    restart: always
+#    environment:
+#      POSTGRES_DB: ${PROD_DB_NAME:-web_storage_prod}
+#      POSTGRES_USER: ${PROD_DB_USER:-admin}
+#      POSTGRES_PASSWORD: ${PROD_DB_PASS:-secret_prod}
+#    volumes:
+#      - prod_postgres_data:/var/lib/postgresql/data
 
 volumes:
-  prod_postgres_data:
+#  prod_postgres_data:
   prod_storage:
+
+networks:
+  prod_net:
+    driver: bridge
