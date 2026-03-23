@@ -29,7 +29,8 @@ if (isset($_GET['action']) && $_GET['action'] === 'logout') {
 }
 
 $userId = $auth->getCurrentUserId();
-$fileManager = new FileManager($userId);
+$storage = \App\Storage\StorageFactory::create();
+$fileManager = new FileManager($userId, $storage);
 
 $error = '';
 $success = '';

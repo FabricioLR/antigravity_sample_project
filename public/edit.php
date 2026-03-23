@@ -22,7 +22,8 @@ if ($auth->mustChangePassword()) {
 }
 
 $userId = $auth->getCurrentUserId();
-$fileManager = new FileManager($userId);
+$storage = \App\Storage\StorageFactory::create();
+$fileManager = new FileManager($userId, $storage);
 
 if (!isset($_GET['file']) || empty($_GET['file'])) {
     header('Location: /dashboard.php');

@@ -17,7 +17,8 @@ class FileManagerTest extends TestCase {
         }
         mkdir($this->testStorageRoot, 0777, true);
         
-        $this->fileManager = new FileManager(1, $this->testStorageRoot);
+        $storage = new \App\Storage\LocalStorage($this->testStorageRoot);
+        $this->fileManager = new \App\FileManager(1, $storage);
     }
 
     protected function tearDown(): void {
@@ -105,7 +106,7 @@ class FileManagerTest extends TestCase {
         ]);
 
         $path = $this->fileManager->getFilePath('test_path.txt');
-        $this->assertEquals($this->testStorageRoot . '/user_1/test_path.txt', $path);
+        $this->assertEquals('user_1/test_path.txt', ltrim(str_replace($this->testStorageRoot, '', $path), '/'));
         $this->assertTrue(file_exists($path));
     }
 
@@ -194,7 +195,7 @@ class FileManagerTest extends TestCase {
         $filename = 'new_file.txt';
         $this->fileManager->createFile($filename);
         
-        $path = $this->testStorageRoot . '/user_1/' . $filename;
+        $path = $this->fileManager->getFilePath($filename);
         $this->assertFileExists($path);
         $this->assertEquals('', file_get_contents($path));
     }
