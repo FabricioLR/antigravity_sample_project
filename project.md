@@ -15,5 +15,6 @@ O **Web Storage** é uma plataforma de gerenciamento de arquivos em nuvem modern
 
 1. **Testes Obrigatórios**: Sempre criar testes para novas implementações.
 2. **Commits Automáticos**: Sempre fazer commit das alterações caso todos os testes passem com sucesso.
+3. **Desenvolvimento em Branch Dev**: Todo o desenvolvimento deve ser realizado na branch `dev`. Após cada commit local, deve-se realizar o `git push origin dev` imediatamente.
 
 > **Nota**: Este arquivo serve como referência principal da stack e da arquitetura base. Deve ser consultado antes de propor ou realizar qualquer nova implementação na aplicação para garantir consistência tecnológica.
