@@ -1,37 +1,39 @@
-version: '3.8'
-
 services:
   app:
     build:
       context: .
-      dockerfile: docker/php/Dockerfile.dev
+      dockerfile: docker/php/Dockerfile.test
     container_name: web_storage_app_test
     working_dir: /var/www/html
-    volumes:
-      - ./:/var/www/html
     environment:
       - DB_CONNECTION=pgsql
       - DB_HOST=db_test
-      - DB_PORT=5433
+      - DB_PORT=5432
       - DB_DATABASE=${TEST_DB_NAME:-web_storage_test}
       - DB_USERNAME=${TEST_DB_USER:-test_user}
       - DB_PASSWORD=${TEST_DB_PASS:-test_pass}
     depends_on:
-      - db_test
+      db_test:
+        condition: service_healthy
     networks:
       - test_net
 
   db_test:
     image: postgres:15-alpine
     container_name: web_storage_db_test
-    command: postgres -p 5433
+    command: postgres -p 5432
     environment:
       POSTGRES_DB: ${TEST_DB_NAME:-web_storage_test}
       POSTGRES_USER: ${TEST_DB_USER:-test_user}
       POSTGRES_PASSWORD: ${TEST_DB_PASS:-test_pass}
     networks:
       - test_net
-    # No volume mapping for persistence, ephemeral DB for tests purely
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
 
 networks:
   test_net:

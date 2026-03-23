@@ -19,7 +19,7 @@ pipeline {
             steps {
                 script {
                     echo 'Build da imagem...'
-                    sh 'docker compose -f docker-compose.prod.yml build --no-cache';
+                    sh 'docker compose -f docker-compose.prod.yml build';
                 }
             }
         }
@@ -30,9 +30,8 @@ pipeline {
                     echo 'Realizando deploy usando containers independentes via shell puro...'
                     
                     withCredentials([file(credentialsId: 'web_storage_prod_env', variable: 'PROD_ENV_FILE')]) {
-                        sh 'cp $PROD_ENV_FILE .env'
-                        
                         sh '''
+                        cp $PROD_ENV_FILE .env
                         cat .env
                         docker compose -f docker-compose.prod.yml down
                         docker compose -f docker-compose.prod.yml up -d
