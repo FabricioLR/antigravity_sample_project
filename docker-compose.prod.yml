@@ -25,6 +25,8 @@ services:
     restart: unless-stopped
     ports:
       - "1234:1234"
+    volumes:
+      - /etc/letsencrypt/archive/server1.fabriciolr.online:/etc/nginx/cert:ro
     depends_on:
       - app
     networks:
