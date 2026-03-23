@@ -32,7 +32,6 @@ pipeline {
                     withCredentials([file(credentialsId: 'web_storage_prod_env', variable: 'PROD_ENV_FILE')]) {
                         sh '''
                         cp $PROD_ENV_FILE .env
-                        cat .env
                         docker compose -f docker-compose.prod.yml down
                         docker compose -f docker-compose.prod.yml up -d
                         '''
