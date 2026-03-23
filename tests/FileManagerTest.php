@@ -189,4 +189,22 @@ class FileManagerTest extends TestCase {
         $this->expectException(Exception::class);
         $this->fileManager->renameFile('renamed.txt', 'existing.txt');
     }
+
+    public function testCreateFile() {
+        $filename = 'new_file.txt';
+        $this->fileManager->createFile($filename);
+        
+        $path = $this->testStorageRoot . '/user_1/' . $filename;
+        $this->assertFileExists($path);
+        $this->assertEquals('', file_get_contents($path));
+    }
+
+    public function testCreateExistingFileThrowsException() {
+        $filename = 'existing_for_create.txt';
+        $this->fileManager->createFile($filename);
+        
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage("Arquivo com este nome já existe.");
+        $this->fileManager->createFile($filename);
+    }
 }

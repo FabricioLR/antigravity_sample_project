@@ -22,8 +22,28 @@
 .upload-form {
     display: flex; gap: 0.5rem; align-items: center;
 }
-.upload-label {
-    margin: 0; cursor: pointer;
+.btn-group {
+    display: flex; align-items: stretch; overflow: visible; border-radius: 12px;
+}
+.btn-upload-main {
+    border-top-right-radius: 0; border-bottom-right-radius: 0; margin: 0; cursor: pointer; border-right: 1px solid rgba(255,255,255,0.2);
+    display: flex; align-items: center;
+}
+.btn-dropdown-toggle {
+    border-top-left-radius: 0; border-bottom-left-radius: 0; padding: 0.75rem 0.6rem; margin: 0; display: flex; align-items: center; justify-content: center;
+    height: 100%; border-radius: 0 12px 12px 0;
+}
+.dropdown {
+    position: relative;
+    display: flex;
+}
+.dropdown.active .dropdown-menu {
+    display: flex;
+    animation: fadeInDropdown 0.2s ease-out forwards;
+}
+.dropdown-menu-right {
+    right: 0; left: auto;
+    top: calc(100% + 5px);
 }
 .hidden-input {
     display: none;

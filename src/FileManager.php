@@ -150,4 +150,23 @@ class FileManager {
             throw new Exception("Failed to write to file.");
         }
     }
+
+    public function createFile(string $filename): void {
+        $filename = basename($filename);
+        // Basic sanitization
+        $filename = preg_replace('/[^a-zA-Z0-9_\.-]/', '_', $filename);
+        
+        if (empty($filename)) {
+            throw new Exception("Nome de arquivo inválido.");
+        }
+        
+        $path = $this->getUserDirectory() . '/' . $filename;
+        if (file_exists($path)) {
+            throw new Exception("Arquivo com este nome já existe.");
+        }
+        
+        if (@file_put_contents($path, '') === false) {
+            throw new Exception("Falha ao criar arquivo.");
+        }
+    }
 }

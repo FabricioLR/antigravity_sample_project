@@ -172,3 +172,33 @@ function deleteSelected() {
         document.getElementById('bulkActionForm').submit();
     }
 }
+
+// New File Creation Logic
+function toggleCreateDropdown(event) {
+    event.stopPropagation();
+    document.getElementById('createDropdownWrapper').classList.toggle('active');
+}
+
+function createNewTextFile(event) {
+    event.preventDefault();
+    const name = prompt("Digite o nome do novo arquivo (ex: notas.txt):");
+    if (name && name.trim() !== '') {
+        document.getElementById('createFileNameInput').value = name.trim();
+        document.getElementById('createFileForm').submit();
+    }
+}
+
+// Close all dropdowns when clicking outside
+document.addEventListener('click', function(event) {
+    // Profile dropdown
+    const profileDropdown = document.getElementById('profileDropdown');
+    if (profileDropdown && !profileDropdown.contains(event.target)) {
+        profileDropdown.classList.remove('active');
+    }
+    
+    // Create dropdown
+    const createDropdownWrapper = document.getElementById('createDropdownWrapper');
+    if (createDropdownWrapper && !createDropdownWrapper.contains(event.target)) {
+        createDropdownWrapper.classList.remove('active');
+    }
+});

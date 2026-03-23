@@ -44,6 +44,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['file'])) {
     }
 }
 
+// Handle Direct File Creation
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'create_file') {
+    $name = $_POST['name'] ?? '';
+    if (!empty($name)) {
+        try {
+            $fileManager->createFile($name);
+            header("Location: /edit.php?file=" . urlencode($name) . "&new=1");
+            exit;
+        } catch (Exception $e) {
+            $error = $e->getMessage();
+        }
+    } else {
+        $error = "Nome de arquivo inválido.";
+    }
+}
+
 // Handle Bulk Deletion
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'bulk_delete' && isset($_POST['files'])) {
     try {
@@ -174,12 +190,32 @@ function formatBytes($bytes, $precision = 2) {
                 <p class="page-subtitle">Gerencie seus documentos em um ambiente seguro</p>
             </div>
             
-            <form action="/dashboard.php" method="POST" enctype="multipart/form-data" class="upload-form">
-                <input type="file" name="file" id="file" required class="hidden-input" onchange="this.form.submit()">
-                <label for="file" class="btn btn-primary upload-label">
-                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
-                    Fazer Upload
-                </label>
+            <div class="header-actions">
+                <form action="/dashboard.php" method="POST" enctype="multipart/form-data" class="upload-form" id="uploadForm">
+                    <input type="file" name="file" id="file" required class="hidden-input" onchange="this.form.submit()">
+                    <div class="btn-group">
+                        <label for="file" class="btn btn-primary btn-upload-main">
+                            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                            Fazer Upload
+                        </label>
+                        <div class="dropdown" id="createDropdownWrapper">
+                            <button type="button" class="btn btn-primary btn-dropdown-toggle" onclick="toggleCreateDropdown(event)">
+                                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                            </button>
+                            <div class="dropdown-menu dropdown-menu-right" id="createDropdown">
+                                <a href="#" class="dropdown-item" onclick="createNewTextFile(event)">
+                                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                                    Criar Arquivo de Texto
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            
+            <form id="createFileForm" method="POST" action="/dashboard.php" style="display: none;">
+                <input type="hidden" name="action" value="create_file">
+                <input type="hidden" name="name" id="createFileNameInput" value="">
             </form>
         </div>
 

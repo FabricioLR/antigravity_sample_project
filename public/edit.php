@@ -106,7 +106,11 @@ try {
                 </div>
                 
                 <div class="editor-actions">
-                    <a href="/dashboard.php" class="btn btn-cancel">
+                    <?php 
+                    $isNew = isset($_GET['new']) && $_GET['new'] === '1';
+                    $cancelUrl = $isNew ? "/dashboard.php?action=delete&file=" . urlencode($filename) : "/dashboard.php";
+                    ?>
+                    <a href="<?= $cancelUrl ?>" class="btn btn-cancel">
                         Cancelar
                     </a>
                     <button type="submit" class="btn btn-primary btn-save">
