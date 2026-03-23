@@ -39,10 +39,12 @@ $success = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['file'])) {
     try {
         $filename = $fileManager->uploadFile($_FILES['file']);
-        $success = "Arquivo '$filename' enviado com sucesso!";
+        $_SESSION['success'] = "Arquivo '$filename' enviado com sucesso!";
     } catch (Exception $e) {
-        $error = $e->getMessage();
+        $_SESSION['error'] = $e->getMessage();
     }
+    header("Location: /dashboard.php");
+    exit;
 }
 
 // Handle Direct File Creation
@@ -54,11 +56,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             header("Location: /edit.php?file=" . urlencode($name) . "&new=1");
             exit;
         } catch (Exception $e) {
-            $error = $e->getMessage();
+            $_SESSION['error'] = $e->getMessage();
         }
     } else {
-        $error = "Nome de arquivo inválido.";
+        $_SESSION['error'] = "Nome de arquivo inválido.";
     }
+    header("Location: /dashboard.php");
+    exit;
 }
 
 // Handle Bulk Deletion
@@ -67,14 +71,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         $filesToDelete = json_decode($_POST['files'], true);
         if (is_array($filesToDelete) && !empty($filesToDelete)) {
             $result = $fileManager->bulkDelete($filesToDelete);
-            $success = $result['success'] . " arquivo(s) apagado(s) com sucesso.";
+            $_SESSION['success'] = $result['success'] . " arquivo(s) apagado(s) com sucesso.";
             if ($result['failed'] > 0) {
-                $error .= $result['failed'] . " arquivo(s) falharam em ser apagados. ";
+                $_SESSION['error'] = $result['failed'] . " arquivo(s) falharam em ser apagados.";
             }
         }
     } catch (Exception $e) {
-        $error = $e->getMessage();
+        $_SESSION['error'] = $e->getMessage();
     }
+    header("Location: /dashboard.php");
+    exit;
 }
 
 // Handle Rename
@@ -84,24 +90,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     if (!empty($oldName) && !empty($newName)) {
         try {
             $renamed = $fileManager->renameFile($oldName, $newName);
-            $success = "Arquivo '$oldName' renomeado para '$renamed' com sucesso!";
+            $_SESSION['success'] = "Arquivo '$oldName' renomeado para '$renamed' com sucesso!";
         } catch (Exception $e) {
-            $error = $e->getMessage();
+            $_SESSION['error'] = $e->getMessage();
         }
     } else {
-        $error = "Nome de arquivo inválido.";
+        $_SESSION['error'] = "Nome de arquivo inválido.";
     }
+    header("Location: /dashboard.php");
+    exit;
 }
 
 // Handle File Deletion
 if (isset($_GET['action']) && $_GET['action'] === 'delete' && isset($_GET['file'])) {
     try {
         $fileManager->deleteFile($_GET['file']);
-        $success = "Arquivo apagado com sucesso!";
-        header("Location: /dashboard.php?success=" . urlencode($success));
+        $_SESSION['success'] = "Arquivo apagado com sucesso!";
+        header("Location: /dashboard.php");
         exit;
     } catch (Exception $e) {
-        $error = $e->getMessage();
+        $_SESSION['error'] = $e->getMessage();
+        header("Location: /dashboard.php");
+        exit;
     }
 }
 
@@ -129,8 +139,9 @@ if (isset($_GET['action']) && $_GET['action'] === 'download' && isset($_GET['fil
 }
 
 $files = $fileManager->listFiles();
-$successMsg = $_GET['success'] ?? $success;
-$errorMsg = $_GET['error'] ?? $error;
+$successMsg = $_SESSION['success'] ?? '';
+$errorMsg = $_SESSION['error'] ?? '';
+unset($_SESSION['success'], $_SESSION['error']);
 
 function formatBytes($bytes, $precision = 2) { 
     $units = array('B', 'KB', 'MB', 'GB', 'TB'); 
@@ -302,5 +313,20 @@ function formatBytes($bytes, $precision = 2) {
         </div>
     </div>
     <script src="/js/dashboard.js"></script>
+    <script>
+        // Hide alerts after 3 seconds
+        document.addEventListener('DOMContentLoaded', function() {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(function(alert) {
+                setTimeout(function() {
+                    alert.style.opacity = '0';
+                    alert.style.transition = 'opacity 0.5s ease';
+                    setTimeout(function() {
+                        alert.remove();
+                    }, 500);
+                }, 3000);
+            });
+        });
+    </script>
 </body>
 </html>
