@@ -1,0 +1,27 @@
+name: Tests
+
+on:
+  pull_request:
+    branches: [ master ]
+  push:
+    branches: [ dev ] # Also run on push to dev to catch issues early
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up environment
+        run: |
+          mkdir -p storage
+          chmod -R 777 storage
+          # Create a dummy .env for tests if needed
+          cp .env.model .env
+
+      - name: Make run-tests.sh executable
+        run: chmod +x run-tests.sh
+
+      - name: Run tests
+        run: ./run-tests.sh
