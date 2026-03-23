@@ -29,9 +29,19 @@ pipeline {
                 script {
                     echo 'Realizando deploy usando containers independentes via shell puro...'
                     
-                    withCredentials([file(credentialsId: 'web_storage_prod_env', variable: 'PROD_ENV_FILE')]) {
+                    withCredentials([
+                        string(credentialsId: 'web_storage_prod_db_name', variable: 'WEB_STORAGE_PROD_DB_NAME'),
+                        string(credentialsId: 'web_storage_prod_db_user', variable: 'WEB_STORAGE_PROD_DB_USER'),
+                        string(credentialsId: 'web_storage_prod_db_pass', variable: 'WEB_STORAGE_PROD_DB_PASS')
+                    ]) {
+                        sh """
+                        echo "WEB_STORAGE_PROD_DB_NAME=${WEB_STORAGE_PROD_DB_NAME}" > .env
+                        echo "WEB_STORAGE_PROD_DB_USER=${WEB_STORAGE_PROD_DB_USER}" >> .env
+                        echo "WEB_STORAGE_PROD_DB_PASS=${WEB_STORAGE_PROD_DB_PASS}" >> .env
+                        """
+
                         sh '''
-                        cp $PROD_ENV_FILE .env
+                        
                         docker compose -f docker-compose.prod.yml down
                         docker compose -f docker-compose.prod.yml up -d
                         '''
