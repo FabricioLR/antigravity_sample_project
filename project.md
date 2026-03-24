@@ -61,7 +61,7 @@ Para garantir a integridade do código e a eficiência na colaboração (Humano/
 2.  **Commits Atômicos e Unitários**: Realize commits pequenos e focados em uma única funcionalidade ou correção. Evite commits massivos.
 3.  **Padronização de Código (PSR-12)**: Todo código PHP deve seguir rigorosamente os padrões PSR-12 para consistência estilística.
 4.  **Sincronização com Documentação**: Qualquer mudança na arquitetura, novas variáveis de ambiente ou novos diretórios **devem** ser refletidos imediatamente neste `project.md` e no `README.md`.
-5.  **Ciclo de Branch Dev**: O desenvolvimento ocorre na branch `dev`. Faça push imediato após a passagem dos testes locais para garantir que o CI/CD valide a build.
+5.  **Ciclo de Branch Dev**: O desenvolvimento ocorre na branch `dev`. O `git push origin dev` **só deve ser realizado após todos os testes passarem** com o comando `./run-tests.sh`. Caso algum teste falhe, as correções devem ser feitas localmente até a aprovação total antes de qualquer sincronização com o GitHub.
 6.  **Segurança Pró-ativa**: Nunca utilize credenciais hardcoded. Utilize sempre as abstrações em `src/Config/` que consomem variáveis do `.env`.
 
 > **Nota**: Consulte este arquivo antes de qualquer refatoração para garantir que os limites arquiteturais (como a abstração de storage) sejam respeitados.
