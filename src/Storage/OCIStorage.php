@@ -20,10 +20,10 @@ class OCIStorage implements StorageInterface {
     public function put(string $path, string $content): void {
         try {
             $this->client->putObject([
-                'NamespaceName' => $this->namespace,
-                'BucketName' => $this->bucket,
-                'ObjectName' => ltrim($path, '/'),
-                'PutObjectBody' => $content
+                'namespaceName' => $this->namespace,
+                'bucketName' => $this->bucket,
+                'objectName' => ltrim($path, '/'),
+                'putObjectBody' => $content
             ]);
         } catch (Exception $e) {
             throw new Exception("OCI Upload Failed: " . $e->getMessage());
@@ -33,9 +33,9 @@ class OCIStorage implements StorageInterface {
     public function get(string $path): string {
         try {
             $response = $this->client->getObject([
-                'NamespaceName' => $this->namespace,
-                'BucketName' => $this->bucket,
-                'ObjectName' => ltrim($path, '/')
+                'namespaceName' => $this->namespace,
+                'bucketName' => $this->bucket,
+                'objectName' => ltrim($path, '/')
             ]);
             return (string)$response->getBody();
         } catch (Exception $e) {
@@ -46,9 +46,9 @@ class OCIStorage implements StorageInterface {
     public function delete(string $path): void {
         try {
             $this->client->deleteObject([
-                'NamespaceName' => $this->namespace,
-                'BucketName' => $this->bucket,
-                'ObjectName' => ltrim($path, '/')
+                'namespaceName' => $this->namespace,
+                'bucketName' => $this->bucket,
+                'objectName' => ltrim($path, '/')
             ]);
         } catch (Exception $e) {
             // Ignore if not found during delete
@@ -58,25 +58,25 @@ class OCIStorage implements StorageInterface {
     public function list(string $prefix = ''): array {
         try {
             $response = $this->client->listObjects([
-                'NamespaceName' => $this->namespace,
-                'BucketName' => $this->bucket,
-                'Prefix' => ltrim($prefix, '/') . '/',
-                'Fields' => 'name,size,timeCreated'
+                'namespaceName' => $this->namespace,
+                'bucketName' => $this->bucket,
+                'prefix' => ltrim($prefix, '/') . '/',
+                'fields' => 'name,size,timeCreated'
             ]);
 
             $data = $response->getJson();
-            $objects = $data['objects'] ?? [];
+            $objects = $data->objects ?? [];
             $result = [];
             foreach ($objects as $obj) {
-                $name = $obj['name'];
+                $name = $obj->name;
                 // Strip prefix
                 $name = str_replace(ltrim($prefix, '/') . '/', '', $name);
                 if (empty($name)) continue;
 
                 $result[] = [
                     'name' => $name,
-                    'size' => $obj['size'],
-                    'modified' => strtotime($obj['timeCreated'])
+                    'size' => $obj->size,
+                    'modified' => strtotime($obj->timeCreated)
                 ];
             }
             return $result;
@@ -88,9 +88,9 @@ class OCIStorage implements StorageInterface {
     public function exists(string $path): bool {
         try {
             $this->client->headObject([
-                'NamespaceName' => $this->namespace,
-                'BucketName' => $this->bucket,
-                'ObjectName' => ltrim($path, '/')
+                'namespaceName' => $this->namespace,
+                'bucketName' => $this->bucket,
+                'objectName' => ltrim($path, '/')
             ]);
             return true;
         } catch (Exception $e) {
@@ -102,9 +102,9 @@ class OCIStorage implements StorageInterface {
         // OCI doesn't have rename, must copy and delete
         try {
             $this->client->copyObject([
-                'NamespaceName' => $this->namespace,
-                'BucketName' => $this->bucket,
-                'CopyObjectDetails' => [
+                'namespaceName' => $this->namespace,
+                'bucketName' => $this->bucket,
+                'copyObjectDetails' => [
                     'sourceObjectName' => ltrim($oldPath, '/'),
                     'destinationObjectName' => ltrim($newPath, '/'),
                     'destinationBucket' => $this->bucket,
