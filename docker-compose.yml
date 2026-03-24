@@ -8,22 +8,25 @@ services:
     working_dir: /var/www/html
     volumes:
       - ./:/var/www/html
+    env_file:
+      - .env
     environment:
-      - DB_CONNECTION=pgsql
-      - DB_HOST=db
-      - DB_PORT=5432
-      - DB_DATABASE=${DB_DATABASE:-web_storage}
-      - DB_USERNAME=${DB_USERNAME:-admin}
-      - DB_PASSWORD=${DB_PASSWORD:-secret}
-    command: /bin/bash -c "mkdir -p /var/www/html/storage && chmod -R 777 /var/www/html/storage && php-fpm"
+      - DB_CONNECTION=${DB_CONNECTION:-pgsql}
+      - DB_HOST=${DEV_DB_HOST:-db}
+      - DB_PORT=${DB_PORT:-5432}
+      - DB_DATABASE=${DEV_DB_DATABASE:-web_storage}
+      - DB_USERNAME=${DEV_DB_USERNAME:-admin}
+      - DB_PASSWORD=${DEV_DB_PASSWORD:-secret}
+    command: /bin/bash -c "php src/init_db.php && mkdir -p /var/www/html/storage && chmod -R 777 /var/www/html/storage && php-fpm"
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     networks:
       - dev_net
 
 
   web:
-    image: nginx:alpine
+    image: nginx:latest
     container_name: web_storage_nginx
     restart: unless-stopped
     ports:
@@ -40,12 +43,20 @@ services:
     image: postgres:15-alpine
     container_name: web_storage_db
     restart: unless-stopped
+    env_file:
+      - .env
     environment:
-      POSTGRES_DB: ${DB_DATABASE:-web_storage}
-      POSTGRES_USER: ${DB_USERNAME:-admin}
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-secret}
+      POSTGRES_DB: ${DEV_POSTGRES_DB:-web_storage}
+      POSTGRES_USER: ${DEV_POSTGRES_USER:-admin}
+      POSTGRES_PASSWORD: ${DEV_POSTGRES_PASSWORD:-secret}
     volumes:
       - default_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
     ports:
       - "5432:5432"
     networks:

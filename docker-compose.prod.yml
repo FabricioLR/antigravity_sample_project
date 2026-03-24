@@ -5,13 +5,15 @@ services:
       dockerfile: docker/php/Dockerfile.prod
     container_name: web_storage_app_prod
     restart: unless-stopped
+    env_file:
+      - .env
     environment:
-      - DB_CONNECTION=pgsql
+      - DB_CONNECTION=${DB_CONNECTION:-pgsql}
       - DB_HOST=${PROD_DB_HOST:-10.0.0.110}
-      - DB_PORT=5432
-      - DB_DATABASE=${WEB_STORAGE_PROD_DB_NAME:-web_storage_prod}
-      - DB_USERNAME=${WEB_STORAGE_PROD_DB_USER:-admin}
-      - DB_PASSWORD=${WEB_STORAGE_PROD_DB_PASS:-secret_prod}
+      - DB_PORT=${DB_PORT:-5432}
+      - DB_DATABASE=${PROD_DB_DATABASE:-web_storage_prod}
+      - DB_USERNAME=${PROD_DB_USERNAME:-admin_prod}
+      - DB_PASSWORD=${PROD_DB_PASSWORD:-secret_prod}
     volumes:
       - prod_storage:/var/www/html/storage
     networks:
