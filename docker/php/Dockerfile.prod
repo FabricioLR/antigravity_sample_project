@@ -18,9 +18,10 @@ RUN echo "opcache.enable=1" >> /usr/local/etc/php/conf.d/opcache-recommended.ini
     && echo "opcache.revalidate_freq=2" >> /usr/local/etc/php/conf.d/opcache-recommended.ini \
     && echo "opcache.fast_shutdown=1" >> /usr/local/etc/php/conf.d/opcache-recommended.ini
 
-# Configure PHP Upload Limits
+# Configure PHP Upload Limits and Error Reporting
 RUN echo "upload_max_filesize = 100M" > /usr/local/etc/php/conf.d/uploads.ini \
-    && echo "post_max_size = 100M" >> /usr/local/etc/php/conf.d/uploads.ini
+    && echo "post_max_size = 100M" >> /usr/local/etc/php/conf.d/uploads.ini \
+    && echo "error_reporting = E_ALL & ~E_DEPRECATED & ~E_USER_DEPRECATED" > /usr/local/etc/php/conf.d/error_reporting.ini
 
 # Get latest Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer

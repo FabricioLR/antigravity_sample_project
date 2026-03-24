@@ -3,20 +3,23 @@
 namespace App\Config;
 
 use Oracle\Oci\ObjectStorage\ObjectStorageClient;
-use Oracle\Oci\Common\Config\Config;
+use Oracle\Oci\Common\Auth\UserAuthProvider;
 
 class OCIConfig {
     public static function createClient(): ObjectStorageClient {
-        // Load from environment or home config
-        $config = new Config([
-            'user' => getenv('OCI_USER_OCID'),
-            'tenancy' => getenv('OCI_TENANCY_OCID'),
-            'fingerprint' => getenv('OCI_FINGERPRINT'),
-            'key_file' => getenv('OCI_KEY_FILE'),
-            'region' => getenv('OCI_REGION')
-        ]);
+        $keyFile = getenv('OCI_KEY_FILE');
+        if (strpos($keyFile, 'file://') !== 0) {
+            $keyFile = 'file://' . $keyFile;
+        }
 
-        return new ObjectStorageClient($config);
+        $authProvider = new UserAuthProvider(
+            getenv('OCI_TENANCY_OCID'),
+            getenv('OCI_USER_OCID'),
+            getenv('OCI_FINGERPRINT'),
+            $keyFile
+        );
+
+        return new ObjectStorageClient($authProvider, getenv('OCI_REGION'));
     }
 
     public static function getNamespace(): string {

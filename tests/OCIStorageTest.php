@@ -63,9 +63,9 @@ class OCIStorageTest extends TestCase {
 
     public function testList() {
         $responseMock = $this->createMock(OciResponse::class);
-        $responseMock->method('getJson')->willReturn([
+        $responseMock->method('getJson')->willReturn((object)[
             'objects' => [
-                [
+                (object)[
                     'name' => 'user_1/file1.txt',
                     'size' => 100,
                     'timeCreated' => date('c')

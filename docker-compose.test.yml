@@ -5,13 +5,15 @@ services:
       dockerfile: docker/php/Dockerfile.test
     container_name: web_storage_app_test
     working_dir: /var/www/html
+    env_file:
+      - .env
     environment:
-      - DB_CONNECTION=pgsql
-      - DB_HOST=db_test
-      - DB_PORT=5432
-      - DB_DATABASE=${TEST_DB_NAME:-web_storage_test}
-      - DB_USERNAME=${TEST_DB_USER:-test_user}
-      - DB_PASSWORD=${TEST_DB_PASS:-test_pass}
+      - DB_CONNECTION=${DB_CONNECTION:-pgsql}
+      - DB_HOST=${TEST_DB_HOST:-db_test}
+      - DB_PORT=${DB_PORT:-5432}
+      - DB_DATABASE=${TEST_DB_DATABASE:-web_storage_test}
+      - DB_USERNAME=${TEST_DB_USERNAME:-test_user}
+      - DB_PASSWORD=${TEST_DB_PASSWORD:-test_pass}
     depends_on:
       db_test:
         condition: service_healthy
@@ -22,10 +24,12 @@ services:
     image: postgres:15-alpine
     container_name: web_storage_db_test
     command: postgres -p 5432
+    env_file:
+      - .env
     environment:
-      POSTGRES_DB: ${TEST_DB_NAME:-web_storage_test}
-      POSTGRES_USER: ${TEST_DB_USER:-test_user}
-      POSTGRES_PASSWORD: ${TEST_DB_PASS:-test_pass}
+      POSTGRES_DB: ${TEST_POSTGRES_DB:-web_storage_test}
+      POSTGRES_USER: ${TEST_POSTGRES_USER:-test_user}
+      POSTGRES_PASSWORD: ${TEST_POSTGRES_PASSWORD:-test_pass}
     networks:
       - test_net
     healthcheck:
