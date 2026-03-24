@@ -10,15 +10,37 @@ Este projeto foi desenhado sob o conceito de "Glassmorphism" e possui design dar
 
 O Web Storage foi construído utilizando as melhores e mais robustas opções do ecossistema Web Open-Source:
 
-- **Back-end**: PHP 8.3 (FPM) rodando dentro de containers estruturados.
+- **Back-end**: PHP 8.4 (FPM) rodando dentro de containers estruturados.
 - **Servidor Web**: Nginx configurado com uploads expandidos (até 100MB por arquivo).
 - **Banco de Dados**: PostgreSQL, mantendo forte integridade relacional.
+- **Armazenamento de Objetos**: Oracle Cloud Infrastructure (OCI) Object Storage ou Armazenamento Local.
 - **Front-end**: HTML5 semântico, CSS3 Moderno (CSS Grid/Flexbox) e Javascript (Vanilla ES6+).
-- **Testes Unitários**: PHPUnit.
+- **Testes Unitários**: PHPUnit 11.
+- **CI/CD**: Jenkins & GitHub Actions.
 - **Virtualização**: Docker + Docker Compose (para ambientes Dev / Prod).
 
 ### 🤖 Powered by Antigravity AI
 Todo o desenvolvimento arquitetural inicial do projeto, refatoração de UI css/js para componentes apartados (modulares), separação dos limites do servidor de imagem do Docker e tratamentos de responsividade deste Web Storage foram orquestrados através do raciocínio avançado do agente assistente inteligente **Antigravity da Google Deepmind**, através da colaboração e pair-programming via instrução de comando reverso na CLI/Workspace.
+
+---
+
+## 🏗️ Arquitetura e Abstração de Armazenamento
+
+O sistema utiliza uma **Arquitetura Híbrida de Persistência** com uma camada de abstração que permite alternar entre armazenamento local e na nuvem através da variável de ambiente `STORAGE_TYPE`:
+
+1.  **Metadados (PostgreSQL)**: Todas as informações relacionais, como usuários, logs de auditoria e referências de arquivos, são armazenadas no banco de dados local.
+2.  **Arquivos Físicos (Abstraction Layer)**:
+    -   **OCI Object Storage (`oci`)**: Integração nativa com o **Oracle Cloud (OCI)** para buckets escaláveis e duráveis.
+    -   **Armazenamento Local (`local`)**: Persistência no sistema de arquivos do servidor/container (ideal para desenvolvimento ou infraestrutura on-premise).
+
+---
+
+## ⚙️ CI/CD & Automação
+
+O fluxo de desenvolvimento e entrega é totalmente automatizado:
+
+- **GitHub Actions**: Executa a malha de testes unitários (`./run-tests.sh`) automaticamente em cada Pull Request para a branch `master` e em cada push para a branch `dev`, garantindo que nenhum código quebre as funcionalidades existentes.
+- **Jenkins**: Atua como o orquestrador de Continuous Deployment (CD). Ele monitora mudanças, reconstrói as imagens de produção (`docker-compose.prod.yml`) e realiza o deploy seguro injetando as variáveis de ambiente necessárias via Jenkins Credentials.
 
 ---
 
@@ -28,7 +50,11 @@ Todo o desenvolvimento arquitetural inicial do projeto, refatoração de UI css/
 Antes de tudo, garanta que o Docker e o `docker-compose` estejam instalados na sua máquina. Para proteger informações sensíveis, todas as credenciais do banco e configurações de ambiente foram extraídas dos arquivos do Docker e mapeadas externamente. 
 
 Na raiz do projeto você encontrará um arquivo chamado `.env.model`. Copie-o (ou apenas renomeie-o) criando um novo arquivo estritamente chamado `.env`.
-Dentro deste `.env`, você poderá personalizar livremente as senhas e nomes de banco de dados para os ambientes de Desenvolvimento (`docker-compose.yml`), Produção e Testes! Os containers do Docker lerão as variáveis automaticamente daqui.
+
+#### Configurações de Armazenamento:
+-   **`STORAGE_TYPE`**: Define o driver de armazenamento. Use `local` para disco local (padrão) ou `oci` para Oracle Cloud.
+-   **`STORAGE_ROOT`**: (Apenas para `local`) O caminho no container onde os arquivos serão salvos (ex: `/var/www/html/storage`).
+-   **Credenciais OCI**: Caso use `oci`, configure `OCI_USER_OCID`, `OCI_TENANCY_OCID`, `OCI_REGION`, `OCI_FINGERPRINT`, `OCI_KEY_FILE`, `OCI_NAMESPACE` e `OCI_BUCKET`.
 
 ### 1️⃣ Executando em Ambiente de Teste/Desenvolvimento
 Para inciar a aplicação via Docker Compose na porta 80 do seu localhost, execute:
@@ -60,11 +86,18 @@ No diretório raiz do projeto, disponibilizamos dois scripts auxiliares BASH par
    ./set_permissions.sh
    ```
 
-### 4️⃣ Deploy para Produção Limitada 
-Você notará que existe um construtor otimizado exclusivo chamado `Dockerfile.prod`, além de configurações focadas no opcache. Para forçar um deploy fechado em ambiente de produção (mais veloz), monte usando:
-```bash
-docker compose -f docker-compose.prod.yml up --build -d
-```
+---
+
+## 📂 Estrutura do Projeto
+
+-   `src/Config/`: Configurações de Banco de Dados e OCI.
+-   `src/Storage/`: Abstração e drivers de armazenamento (`LocalStorage`, `OCIStorage`).
+-   `src/Auth.php`: Gerenciamento de sessões e autenticação.
+-   `src/UserManager.php`: CRUD de usuários e permissões.
+-   `src/FileManager.php`: Lógica de gerenciamento de objetos na nuvem.
+-   `tests/`: Suíte de testes unitários.
+-   `.github/workflows/`: Automação de CI com GitHub Actions.
+-   `Jenkinsfile`: Pipeline de build e deploy contínuo.
 
 ---
 
