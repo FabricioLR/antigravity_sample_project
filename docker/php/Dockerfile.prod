@@ -34,3 +34,4 @@ RUN composer install --no-dev --optimize-autoloader --no-scripts || true
 
 # Set permissions for storage
 RUN mkdir -p storage && chmod -R 777 storage
+RUN chown -R www-data:www-data .oci && chmod 600 .oci/server1.pem

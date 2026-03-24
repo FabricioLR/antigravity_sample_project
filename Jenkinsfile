@@ -29,6 +29,10 @@ pipeline {
         stage('Build Imagem de Produção') {
             steps {
                 script {
+                    echo 'Configurando credenciais OCI para o build...'
+                    withCredentials([file(credentialsId: 'web_storage_oci_private_key_file', variable: 'OCI_KEY_FILE')]) {
+                        sh "mkdir -p .oci && cp \$OCI_KEY_FILE .oci/server1.pem"
+                    }
                     echo 'Build da imagem...'
                     sh 'docker compose -f docker-compose.prod.yml build';
                 }
@@ -44,7 +48,7 @@ pipeline {
                         string(credentialsId: 'web_storage_prod_db_name', variable: 'WEB_STORAGE_PROD_DB_NAME'),
                         string(credentialsId: 'web_storage_prod_db_user', variable: 'WEB_STORAGE_PROD_DB_USER'),
                         string(credentialsId: 'web_storage_prod_db_pass', variable: 'WEB_STORAGE_PROD_DB_PASS'),
-                        string(credentialsId: 'web_storage_oci_key_file', variable: 'OCI_KEY_FILE'),
+            
                         string(credentialsId: 'web_storage_oci_tenancy_ocid', variable: 'OCI_TENANCY_OCID'),
                         string(credentialsId: 'web_storage_oci_user_ocid', variable: 'OCI_USER_OCID'),
                         string(credentialsId: 'web_storage_oci_fingerprint', variable: 'OCI_FINGERPRINT'),
@@ -62,8 +66,7 @@ pipeline {
                         echo "PROD_POSTGRES_PASSWORD=${WEB_STORAGE_PROD_DB_PASS}" >> .env
                         echo "STORAGE_TYPE=oci" >> .env
                         echo "STORAGE_ROOT=/var/www/html/storage" >> .env
-                        
-                        echo "OCI_KEY_FILE=${OCI_KEY_FILE}" >> .env
+                        echo "OCI_KEY_FILE=/var/www/html/.oci/server1.pem" >> .env
                         echo "OCI_TENANCY_OCID=${OCI_TENANCY_OCID}" >> .env
                         echo "OCI_USER_OCID=${OCI_USER_OCID}" >> .env
                         echo "OCI_FINGERPRINT=${OCI_FINGERPRINT}" >> .env
