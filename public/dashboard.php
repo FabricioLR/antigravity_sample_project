@@ -151,6 +151,8 @@ function formatBytes($bytes, $precision = 2) {
     $bytes /= pow(1024, $pow);
     return round($bytes, $precision) . ' ' . $units[$pow]; 
 }
+
+$shareBaseUrl = getenv('SHARE_BASE_URL') ?: '';
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -160,6 +162,9 @@ function formatBytes($bytes, $precision = 2) {
     <title>Dashboard - Web Storage</title>
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="/css/dashboard.css">
+    <script>
+        window.SHARE_BASE_URL = "<?= htmlspecialchars($shareBaseUrl) ?>";
+    </script>
 </head>
 <body>
     <nav class="navbar glass-panel dashboard-nav">

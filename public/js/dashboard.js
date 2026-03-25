@@ -257,9 +257,15 @@ function generateShare() {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            const protocol = window.location.protocol;
-            const host = window.location.host;
-            const shareUrl = `${protocol}//${host}/${data.uuid}`;
+            let shareUrl;
+            if (window.SHARE_BASE_URL && window.SHARE_BASE_URL.trim() !== '') {
+                // Remove trailing slash if exists and append UUID
+                shareUrl = window.SHARE_BASE_URL.replace(/\/$/, '') + '/' + data.uuid;
+            } else {
+                const protocol = window.location.protocol;
+                const host = window.location.host;
+                shareUrl = `${protocol}//${host}/${data.uuid}`;
+            }
             
             document.getElementById('shareLinkInput').value = shareUrl;
             document.getElementById('shareResultArea').style.display = 'block';
