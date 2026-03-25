@@ -21,6 +21,7 @@ function updateActionBar() {
     const btnEdit = document.getElementById('btnEdit');
     const btnDownload = document.getElementById('btnDownload');
     const btnDelete = document.getElementById('btnDelete');
+    const btnShare = document.getElementById('btnShare');
 
     let canEdit = false;
     if (count === 1) {
@@ -35,6 +36,7 @@ function updateActionBar() {
         if (btnEdit) btnEdit.style.display = 'none';
         if (btnDownload) btnDownload.style.display = 'none';
         if (btnDelete) btnDelete.style.display = 'none';
+        if (btnShare) btnShare.style.display = 'none';
     } else {
         if (btnRename) {
             btnRename.style.display = (count === 1) ? 'inline-flex' : 'none';
@@ -54,6 +56,11 @@ function updateActionBar() {
         if (btnDelete) {
             btnDelete.style.display = 'inline-flex';
             btnDelete.disabled = false;
+        }
+
+        if (btnShare) {
+            btnShare.style.display = (count === 1) ? 'inline-flex' : 'none';
+            btnShare.disabled = false;
         }
     }
 }
@@ -201,4 +208,86 @@ document.addEventListener('click', function(event) {
     if (createDropdownWrapper && !createDropdownWrapper.contains(event.target)) {
         createDropdownWrapper.classList.remove('active');
     }
+
+    // Share Modal
+    const shareModal = document.getElementById('shareModal');
+    if (shareModal && event.target === shareModal) {
+        closeShareModal();
+    }
 });
+
+// Share Functions
+function shareSelected() {
+    const files = getSelectedFiles();
+    if (files.length === 1) {
+        const filename = files[0];
+        document.getElementById('shareFileNameDisplay').innerText = `Arquivo: ${filename}`;
+        document.getElementById('shareResultArea').style.display = 'none';
+        const btnGen = document.getElementById('btnGenerateShare');
+        btnGen.style.display = 'inline-block';
+        btnGen.disabled = false;
+        btnGen.innerText = 'Gerar Link';
+        document.getElementById('shareModal').classList.add('active');
+    }
+}
+
+function closeShareModal() {
+    document.getElementById('shareModal').classList.remove('active');
+}
+
+function generateShare() {
+    const files = getSelectedFiles();
+    if (files.length !== 1) return;
+
+    const filename = files[0];
+    const duration = document.getElementById('shareDuration').value;
+    const btn = document.getElementById('btnGenerateShare');
+    
+    btn.disabled = true;
+    btn.innerText = 'Gerando...';
+
+    const formData = new FormData();
+    formData.append('file', filename);
+    formData.append('duration', duration);
+
+    fetch('/share.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            const protocol = window.location.protocol;
+            const host = window.location.host;
+            const shareUrl = `${protocol}//${host}/${data.uuid}`;
+            
+            document.getElementById('shareLinkInput').value = shareUrl;
+            document.getElementById('shareResultArea').style.display = 'block';
+            btn.style.display = 'none';
+        } else {
+            alert('Erro: ' + data.error);
+            btn.disabled = false;
+            btn.innerText = 'Gerar Link';
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Erro ao conectar com o servidor.');
+        btn.disabled = false;
+        btn.innerText = 'Gerar Link';
+    });
+}
+
+function copyShareLink() {
+    const input = document.getElementById('shareLinkInput');
+    input.select();
+    input.setSelectionRange(0, 99999);
+    navigator.clipboard.writeText(input.value).then(() => {
+        const btn = event.target;
+        const originalText = btn.innerText;
+        btn.innerText = 'Copiado!';
+        setTimeout(() => {
+            btn.innerText = originalText;
+        }, 2000);
+    });
+}

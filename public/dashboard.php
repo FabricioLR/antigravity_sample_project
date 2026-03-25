@@ -272,6 +272,9 @@ function formatBytes($bytes, $precision = 2) {
                     <button class="btn btn-danger action-btn action-btn-delete" id="btnDelete" onclick="deleteSelected()">
                         Apagar
                     </button>
+                    <button class="btn action-btn action-btn-share" id="btnShare" onclick="shareSelected()">
+                        <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"></path></svg> Compartilhar
+                    </button>
                     <span class="selection-count" id="selectionCount">0 itens selecionados</span>
                 </div>
 
@@ -312,6 +315,37 @@ function formatBytes($bytes, $precision = 2) {
             <?php endif; ?>
         </div>
     </div>
+
+    <!-- Share Modal -->
+    <div id="shareModal" class="modal">
+        <div class="modal-content glass-panel" style="max-width: 500px; margin: 10% auto; padding: 2rem; position: relative;">
+            <h2 class="text-gradient">Compartilhar Arquivo</h2>
+            <p id="shareFileNameDisplay" style="margin-bottom: 1rem; opacity: 0.8;"></p>
+            
+            <div class="form-group" style="margin-bottom: 1rem;">
+                <label for="shareDuration">Duração do Link:</label>
+                <select id="shareDuration" style="width: 100%; margin-top: 0.5rem; padding: 0.6rem; border-radius: 8px; background: rgba(255,255,255,0.05); color: white; border: 1px solid rgba(255,255,255,0.1);">
+                    <option value="1h">1 Hora</option>
+                    <option value="1d">1 Dia</option>
+                    <option value="forever">Para Sempre</option>
+                </select>
+            </div>
+
+            <div id="shareResultArea" style="display: none; margin-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1.5rem;">
+                <label>Link de acesso público:</label>
+                <div class="share-link-copy-wrapper" style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
+                    <input type="text" id="shareLinkInput" readonly style="flex: 1; padding: 0.6rem; border-radius: 8px; background: rgba(0,0,0,0.2); color: #fff; border: 1px solid rgba(255,255,255,0.1); font-size: 0.9rem;">
+                    <button class="btn btn-primary" onclick="copyShareLink()">Copiar</button>
+                </div>
+            </div>
+
+            <div class="modal-actions" style="margin-top: 2rem; display: flex; justify-content: flex-end; gap: 1rem;">
+                <button type="button" class="btn" onclick="closeShareModal()">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="btnGenerateShare" onclick="generateShare()">Gerar Link</button>
+            </div>
+        </div>
+    </div>
+
     <script src="/js/dashboard.js"></script>
     <script>
         // Hide alerts after 3 seconds
