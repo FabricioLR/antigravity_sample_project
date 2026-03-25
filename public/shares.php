@@ -182,7 +182,19 @@ function formatExpiry($date) {
             }
 
             navigator.clipboard.writeText(shareUrl).then(() => {
-                alert('Link copiado para a área de transferência!');
+                const msgDiv = document.createElement('div');
+                msgDiv.className = 'alert alert-success';
+                msgDiv.textContent = 'Link copiado para a área de transferência!';
+                const container = document.querySelector('.container');
+                const header = document.querySelector('.page-header');
+                container.insertBefore(msgDiv, header.nextSibling);
+                
+                // Auto-hide the new message
+                setTimeout(() => {
+                    msgDiv.style.transition = 'opacity 0.5s ease';
+                    msgDiv.style.opacity = '0';
+                    setTimeout(() => msgDiv.remove(), 500);
+                }, 3000);
             });
         }
     </script>
