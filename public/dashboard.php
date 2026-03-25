@@ -318,30 +318,35 @@ function formatBytes($bytes, $precision = 2) {
 
     <!-- Share Modal -->
     <div id="shareModal" class="modal">
-        <div class="modal-content glass-panel" style="max-width: 500px; margin: 10% auto; padding: 2rem; position: relative;">
+        <div class="modal-content glass-panel share-modal-content">
             <h2 class="text-gradient">Compartilhar Arquivo</h2>
-            <p id="shareFileNameDisplay" style="margin-bottom: 1rem; opacity: 0.8;"></p>
+            <p id="shareFileNameDisplay" class="share-file-name"></p>
             
-            <div class="form-group" style="margin-bottom: 1rem;">
-                <label for="shareDuration">Duração do Link:</label>
-                <select id="shareDuration" style="width: 100%; margin-top: 0.5rem; padding: 0.6rem; border-radius: 8px; background: rgba(255,255,255,0.05); color: white; border: 1px solid rgba(255,255,255,0.1);">
-                    <option value="1h">1 Hora</option>
-                    <option value="1d">1 Dia</option>
-                    <option value="forever">Para Sempre</option>
-                </select>
-            </div>
-
-            <div id="shareResultArea" style="display: none; margin-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1.5rem;">
-                <label>Link de acesso público:</label>
-                <div class="share-link-copy-wrapper" style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
-                    <input type="text" id="shareLinkInput" readonly style="flex: 1; padding: 0.6rem; border-radius: 8px; background: rgba(0,0,0,0.2); color: #fff; border: 1px solid rgba(255,255,255,0.1); font-size: 0.9rem;">
-                    <button class="btn btn-primary" onclick="copyShareLink()">Copiar</button>
+            <div class="form-group share-form-group">
+                <label for="shareDuration">Duração do Link</label>
+                <div class="custom-select-wrapper">
+                    <select id="shareDuration" class="share-select">
+                        <option value="1h">1 Hora</option>
+                        <option value="1d">1 Dia</option>
+                        <option value="forever" selected>Para Sempre</option>
+                    </select>
                 </div>
             </div>
 
-            <div class="modal-actions" style="margin-top: 2rem; display: flex; justify-content: flex-end; gap: 1rem;">
-                <button type="button" class="btn" onclick="closeShareModal()">Cancelar</button>
-                <button type="button" class="btn btn-primary" id="btnGenerateShare" onclick="generateShare()">Gerar Link</button>
+            <div id="shareResultArea" class="share-result-area">
+                <label>Link de acesso público</label>
+                <div class="share-link-box">
+                    <input type="text" id="shareLinkInput" readonly>
+                    <button class="btn btn-primary btn-copy" onclick="copyShareLink()">
+                        <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg>
+                        <span>Copiar</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="modal-actions share-modal-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeShareModal()">Cancelar</button>
+                <button type="button" class="btn btn-primary shadow-glow" id="btnGenerateShare" onclick="generateShare()">Gerar Link</button>
             </div>
         </div>
     </div>
