@@ -315,7 +315,7 @@ select:focus {
     background: #ffffff;
     border: 1px solid var(--border);
     border-radius: 8px;
-    width: 180px;
+    width: 220px;
     display: none;
     flex-direction: column;
     z-index: 9999;
