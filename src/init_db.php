@@ -27,6 +27,17 @@ try {
         // Ignora se a coluna já existe
     }
 
+    echo "Creating shared_files table...\n";
+    $pdo->exec("
+        CREATE TABLE IF NOT EXISTS shared_files (
+            uuid UUID PRIMARY KEY,
+            user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+            filename TEXT NOT NULL,
+            expires_at TIMESTAMP NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ");
+
     $userManager = new UserManager($db);
     
     // Check if admin exists
