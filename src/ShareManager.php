@@ -56,6 +56,37 @@ class ShareManager {
     }
 
     /**
+     * Lists all shares for a specific user.
+     * 
+     * @param int $userId The ID of the user.
+     * @return array List of shares.
+     */
+    public function listShares(int $userId): array {
+        $stmt = $this->pdo->prepare("
+            SELECT * FROM shared_files 
+            WHERE user_id = ?
+            ORDER BY created_at DESC
+        ");
+        $stmt->execute([$userId]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Deletes a specific share.
+     * 
+     * @param string $uuid The UUID of the share.
+     * @param int $userId The ID of the user (for security).
+     * @return bool True on success.
+     */
+    public function deleteShare(string $uuid, int $userId): bool {
+        $stmt = $this->pdo->prepare("
+            DELETE FROM shared_files 
+            WHERE uuid = ? AND user_id = ?
+        ");
+        return $stmt->execute([$uuid, $userId]) && $stmt->rowCount() > 0;
+    }
+
+    /**
      * Deletes all expired shares from the database.
      */
     public function cleanupExpiredShares(): void {

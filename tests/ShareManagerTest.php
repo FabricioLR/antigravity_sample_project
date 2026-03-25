@@ -116,4 +116,33 @@ class ShareManagerTest extends TestCase {
         $stmt->execute([$uuid]);
         $this->assertEquals(0, $stmt->fetchColumn());
     }
+
+    public function testListShares() {
+        $this->shareManager->createShare(1, 'file1.txt', 'forever');
+        $this->shareManager->createShare(1, 'file2.txt', '1h');
+        
+        $shares = $this->shareManager->listShares(1);
+        $this->assertCount(2, $shares);
+        // Should be ordered by created_at DESC, so file2.txt is likely first if created after
+        $this->assertEquals('file2.txt', $shares[0]['filename']);
+        $this->assertEquals('file1.txt', $shares[1]['filename']);
+    }
+
+    public function testDeleteShare() {
+        $uuid = $this->shareManager->createShare(1, 'todelete.txt', 'forever');
+        $this->assertNotNull($this->shareManager->getShare($uuid));
+
+        $result = $this->shareManager->deleteShare($uuid, 1);
+        $this->assertTrue($result);
+        $this->assertNull($this->shareManager->getShare($uuid));
+    }
+
+    public function testDeleteShareInvalidUser() {
+        $uuid = $this->shareManager->createShare(1, 'notmine.txt', 'forever');
+        
+        // Try to delete with user 2 (which doesn't exist but we want to check user_id check)
+        $result = $this->shareManager->deleteShare($uuid, 2);
+        $this->assertFalse($result);
+        $this->assertNotNull($this->shareManager->getShare($uuid));
+    }
 }
