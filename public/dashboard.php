@@ -118,20 +118,21 @@ if (isset($_GET['action']) && $_GET['action'] === 'delete' && isset($_GET['file'
 // Handle File Download (Streaming through PHP)
 if (isset($_GET['action']) && $_GET['action'] === 'download' && isset($_GET['file'])) {
     try {
-        $path = $fileManager->getFilePath($_GET['file']);
+        $file = $_GET['file'];
+        $content = $fileManager->getFileContent($file);
         
         // Clear buffers
         if (ob_get_length()) ob_end_clean();
         
         header('Content-Description: File Transfer');
         header('Content-Type: application/octet-stream');
-        header('Content-Disposition: attachment; filename="' . basename($path) . '"');
+        header('Content-Disposition: attachment; filename="' . basename($file) . '"');
         header('Expires: 0');
         header('Cache-Control: must-revalidate');
         header('Pragma: public');
-        header('Content-Length: ' . filesize($path));
+        header('Content-Length: ' . strlen($content));
         
-        readfile($path);
+        echo $content;
         exit;
     } catch (Exception $e) {
         $error = "Falha ao baixar arquivo: " . $e->getMessage();
