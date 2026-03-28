@@ -73,7 +73,7 @@ pipeline {
                         echo "OCI_REGION=${OCI_REGION}" >> .env
                         echo "OCI_NAMESPACE=${OCI_NAMESPACE}" >> .env
                         echo "OCI_BUCKET=${OCI_BUCKET}" >> .env
-                        echo "SHARE_BASE_URL=https://server1.fabriciolr.online:1234" >> .env
+                        echo "SHARE_BASE_URL=https://share.fabriciolr.online" >> .env
                         """
 
                         sh '''
