@@ -1,6 +1,6 @@
 FROM nginx:latest
 
-COPY docker/nginx/prod.conf /etc/nginx/conf.d/default.conf
+COPY docker/nginx/default.conf.prod /etc/nginx/conf.d/default.conf
 COPY public /var/www/html/public
 
 EXPOSE 1234

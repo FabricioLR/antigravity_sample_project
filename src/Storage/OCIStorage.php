@@ -4,7 +4,6 @@ namespace App\Storage;
 
 use Exception;
 use Oracle\Oci\ObjectStorage\ObjectStorageClient;
-use Oracle\Oci\Common\Config\Config;
 
 class OCIStorage implements StorageInterface {
     private ObjectStorageClient $client;
@@ -99,20 +98,16 @@ class OCIStorage implements StorageInterface {
     }
 
     public function rename(string $oldPath, string $newPath): void {
-        // OCI doesn't have rename, must copy and delete
         try {
-            $this->client->copyObject([
+            $this->client->renameObject([
                 'namespaceName' => $this->namespace,
                 'bucketName' => $this->bucket,
-                'copyObjectDetails' => [
-                    'sourceObjectName' => ltrim($oldPath, '/'),
-                    'destinationObjectName' => ltrim($newPath, '/'),
-                    'destinationBucket' => $this->bucket,
-                    'destinationNamespace' => $this->namespace,
-                    'destinationRegion' => $this->client->getRegion()
+                'renameObjectDetails' => [
+                    'sourceName' => ltrim($oldPath, '/'),
+                    'newName' => ltrim($newPath, '/'),
+                    'newObjIfNoneMatchETag' => '*'
                 ]
             ]);
-            $this->delete($oldPath);
         } catch (Exception $e) {
             throw new Exception("OCI Rename Failed: " . $e->getMessage());
         }
