@@ -67,6 +67,9 @@
 .action-btn-rename {
     display: none; background: rgba(0,0,0,0.05); color: var(--text-main); padding: 0.4rem 0.8rem;
 }
+.action-btn-replace {
+    display: none; background: rgba(0,0,0,0.05); color: var(--text-main); padding: 0.4rem 0.8rem;
+}
 .action-btn-edit {
     display: none; padding: 0.4rem 0.8rem;
 }
@@ -153,8 +156,29 @@
     background: rgba(18, 18, 24, 0.85);
     box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
 }
+.replace-modal-content {
+    max-width: 480px;
+    margin: 8% auto;
+    padding: 2.5rem;
+    position: relative;
+    border-radius: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    background: rgba(18, 18, 24, 0.85);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+}
 
-.share-file-name {
+.share-file-name{
+    margin-top: 1rem;
+    margin-bottom: 2rem;
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    padding: 0.75rem 1rem;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 12px;
+    border-left: 3px solid var(--primary-color);
+}
+.replace-file-name{
+    margin-top: 1rem;
     margin-bottom: 2rem;
     color: var(--text-muted);
     font-size: 0.95rem;
@@ -168,6 +192,44 @@
     display: block;
     margin-bottom: 0.75rem;
     font-weight: 500;
+}
+
+.replace-form-group label {
+    display: block;
+    margin-bottom: 0.75rem;
+    font-weight: 500;
+}
+
+#replaceFile {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.05);
+    color: rgb(255, 255, 255);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    font-size: 1rem;
+    outline: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    appearance: none;
+}
+
+.replace-result-area p {
+    /* Layout & Spacing */
+    margin: 20px 0;
+    padding: 15px 20px;
+    border-radius: 8px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+
+    /* Success Theme Colors */
+    color: #155724;
+    background-color: #d4edda;
+    border: 1px solid #c3e6cb;
+    
+    /* Subtle Shadow */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .share-select {
@@ -195,6 +257,12 @@
 }
 
 .share-result-area {
+    display: none;
+    margin-top: 2rem;
+    animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.replace-result-area {
     display: none;
     margin-top: 2rem;
     animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
@@ -237,6 +305,13 @@
 }
 
 .share-modal-actions {
+    margin-top: 2.5rem;
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+}
+
+.replace-modal-actions {
     margin-top: 2.5rem;
     display: flex;
     justify-content: flex-end;

@@ -79,6 +79,39 @@ class FileManagerTest extends TestCase {
         $this->fileManager->uploadFile($fileData2);
     }
 
+    public function testUploadExistingFileWithOverwriteFlag() {
+        $tmpFile1 = tempnam(sys_get_temp_dir(), 'test1');
+        file_put_contents($tmpFile1, 'dummy content 1');
+        
+        $fileData1 = [
+            'name' => 'docs.pdf',
+            'tmp_name' => $tmpFile1,
+            'error' => UPLOAD_ERR_OK
+        ];
+        
+        $this->fileManager->uploadFile($fileData1);
+
+        $tmpFile2 = tempnam(sys_get_temp_dir(), 'test2');
+        file_put_contents($tmpFile2, 'dummy content 2222');
+        
+        $fileData2 = [
+            'name' => 'docs.pdf',
+            'tmp_name' => $tmpFile2,
+            'error' => UPLOAD_ERR_OK
+        ];
+
+        //$this->expectException(Exception::class);
+        //$this->expectExceptionMessage("File already exists.");
+
+        $filename = $this->fileManager->uploadFile($fileData2, true);
+        $this->assertEquals('docs.pdf', $filename);
+
+        $files = $this->fileManager->listFiles();
+        $this->assertCount(1, $files);
+        $this->assertEquals('docs.pdf', $files[0]['name']);
+        $this->assertEquals(18, $files[0]['size']);
+    }
+
     public function testDeleteFile() {
         $tmpFile = tempnam(sys_get_temp_dir(), 'test');
         file_put_contents($tmpFile, 'dummy content');

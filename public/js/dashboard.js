@@ -18,6 +18,7 @@ function updateActionBar() {
     
     const topActionBar = document.getElementById('topActionBar');
     const btnRename = document.getElementById('btnRename');
+    const btnReplace = document.getElementById('btnReplace');
     const btnEdit = document.getElementById('btnEdit');
     const btnDownload = document.getElementById('btnDownload');
     const btnDelete = document.getElementById('btnDelete');
@@ -33,6 +34,7 @@ function updateActionBar() {
 
     if (count === 0) {
         if (btnRename) btnRename.style.display = 'none';
+        if (btnReplace) btnReplace.style.display = 'none';
         if (btnEdit) btnEdit.style.display = 'none';
         if (btnDownload) btnDownload.style.display = 'none';
         if (btnDelete) btnDelete.style.display = 'none';
@@ -41,6 +43,11 @@ function updateActionBar() {
         if (btnRename) {
             btnRename.style.display = (count === 1) ? 'inline-flex' : 'none';
             btnRename.disabled = false;
+        }
+
+        if (btnReplace) {
+            btnReplace.style.display = (count === 1) ? 'inline-flex' : 'none';
+            btnReplace.disabled = false;
         }
 
         if (btnEdit) {
@@ -216,6 +223,24 @@ document.addEventListener('click', function(event) {
     }
 });
 
+function replaceSelected() {
+    const files = getSelectedFiles();
+    if (files.length === 1) {
+        const filename = files[0];
+        document.getElementById('replaceFileNameDisplay').innerText = `Arquivo: ${filename}`;
+        document.getElementById('replaceResultArea').style.display = 'none';
+        const btnGen = document.getElementById('btnReplaceFile');
+        btnGen.style.display = 'inline-block';
+        btnGen.disabled = false;
+        btnGen.innerText = 'Gerar Link';
+        document.getElementById('replaceModal').classList.add('active');
+    }
+}
+
+function closeReplaceModal() {
+    document.getElementById('replaceModal').classList.remove('active');
+}
+
 // Share Functions
 function shareSelected() {
     const files = getSelectedFiles();
@@ -233,6 +258,56 @@ function shareSelected() {
 
 function closeShareModal() {
     document.getElementById('shareModal').classList.remove('active');
+}
+
+function replaceFile(){
+    const files = getSelectedFiles();
+    if (files.length !== 1) return;
+
+    const filename = files[0];
+    const newFile = document.getElementById('replaceFile').files[0];
+    const btn = document.getElementById('btnReplaceFile');
+
+    console.log(newFile)
+    
+    btn.disabled = true;
+    btn.innerText = 'Substituindo...';
+
+    //if (filename != newFile.name){
+    //    alert('Nome do arquivo é diferente do original');
+    //    btn.disabled = false;
+    //    btn.innerText = 'Confirmar';
+    //    return;
+    //}
+
+    const formData = new FormData();
+    formData.append('file', filename);
+    formData.append('newFile', newFile);
+
+    fetch('/replace.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log(data)
+        if (data.success) {
+            
+            document.querySelector('#replaceResultArea > p').innerText = "Arquivo substituído com sucesso";
+            document.getElementById('replaceResultArea').style.display = 'block';
+            btn.style.display = 'none';
+        } else {
+            alert('Erro: ' + data.error);
+            btn.disabled = false;
+            btn.innerText = 'Confirmar';
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Erro ao conectar com o servidor.');
+        btn.disabled = false;
+        btn.innerText = 'Confirmar';
+    });
 }
 
 function generateShare() {
