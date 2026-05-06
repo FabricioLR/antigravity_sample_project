@@ -12,7 +12,7 @@ try {
     echo "Creating users table...\n";
     $pdo->exec("
         CREATE TABLE IF NOT EXISTS users (
-            id SERIAL PRIMARY KEY,
+            id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
             username VARCHAR(255) UNIQUE NOT NULL,
             password VARCHAR(255) NOT NULL,
             role VARCHAR(50) DEFAULT 'user',
@@ -31,7 +31,7 @@ try {
     $pdo->exec("
         CREATE TABLE IF NOT EXISTS shared_files (
             uuid UUID PRIMARY KEY,
-            user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+            user_id uuid REFERENCES users(id) ON DELETE CASCADE,
             filename TEXT NOT NULL,
             expires_at TIMESTAMP NULL,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP

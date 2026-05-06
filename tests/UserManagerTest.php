@@ -19,7 +19,7 @@ class UserManagerTest extends TestCase {
         $pdo->exec("DROP TABLE IF EXISTS users CASCADE;");
         $pdo->exec("
             CREATE TABLE users (
-                id SERIAL PRIMARY KEY,
+                id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
                 username VARCHAR(255) UNIQUE NOT NULL,
                 password VARCHAR(255) NOT NULL,
                 role VARCHAR(50) DEFAULT 'user',

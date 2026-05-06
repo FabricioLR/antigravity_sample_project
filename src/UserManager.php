@@ -13,18 +13,19 @@ class UserManager {
         $this->db = $database->getConnection();
     }
 
-    public function addUser(string $username, string $password, string $role = 'user'): int {
+    public function addUser(string $username, string $password, string $role = 'user'): string {
         if ($this->getUserByUsername($username)) {
             throw new Exception("Username already exists.");
         }
 
         $hash = password_hash($password, PASSWORD_DEFAULT);
-        $stmt = $this->db->prepare("INSERT INTO users (username, password, role) VALUES (?, ?, ?)");
+        $stmt = $this->db->prepare("INSERT INTO users (username, password, role) VALUES (?, ?, ?) RETURNING id");
         $stmt->execute([$username, $hash, $role]);
-        return (int) $this->db->lastInsertId();
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        return (string) $result['id'];
     }
 
-    public function changePassword(int $userId, string $currentPassword, string $newPassword): bool {
+    public function changePassword(string $userId, string $currentPassword, string $newPassword): bool {
         $stmt = $this->db->prepare("SELECT password FROM users WHERE id = ?");
         $stmt->execute([$userId]);
         $user = $stmt->fetch();
@@ -42,7 +43,7 @@ class UserManager {
         return $updateStmt->execute([$hash, $userId]);
     }
 
-    public function removeUser(int $id): bool {
+    public function removeUser(string $id): bool {
         // Find user first to prevent removing the last admin (logic simplified for now)
         $stmt = $this->db->prepare("DELETE FROM users WHERE id = ?");
         return $stmt->execute([$id]);
@@ -60,7 +61,7 @@ class UserManager {
         return $user ?: null;
     }
     
-    public function getUserById(int $id): ?array {
+    public function getUserById(string $id): ?array {
         $stmt = $this->db->prepare("SELECT id, username, role, created_at FROM users WHERE id = ?");
         $stmt->execute([$id]);
         $user = $stmt->fetch();
