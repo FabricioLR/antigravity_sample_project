@@ -38,7 +38,7 @@ $success = '';
 // Handle File Upload
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['file'])) {
     try {
-        $filename = $fileManager->uploadFile($_FILES['file']);
+        $filename = $fileManager->uploadFile($_FILES['file'], false);
         $_SESSION['success'] = "Arquivo '$filename' enviado com sucesso!";
     } catch (Exception $e) {
         $_SESSION['error'] = $e->getMessage();
@@ -240,7 +240,7 @@ $shareBaseUrl = getenv('SHARE_BASE_URL') ?: '';
                 <input type="hidden" name="name" id="createFileNameInput" value="">
             </form>
         </div>
-
+        
         <?php if ($errorMsg): ?>
             <div class="alert alert-error"><?= htmlspecialchars($errorMsg) ?></div>
         <?php endif; ?>
@@ -273,17 +273,20 @@ $shareBaseUrl = getenv('SHARE_BASE_URL') ?: '';
                     <button class="btn action-btn action-btn-rename" id="btnRename" onclick="renameSelected()">
                         Renomear
                     </button>
-                    <button class="btn btn-primary action-btn action-btn-edit" id="btnEdit" onclick="editSelected()">
-                        <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg> Editar
+                    <button class="btn action-btn action-btn-replace" id="btnReplace" onclick="replaceSelected()">
+                        Substituir
                     </button>
                     <button class="btn action-btn action-btn-download" id="btnDownload" onclick="downloadSelected()">
                         Baixar
                     </button>
-                    <button class="btn btn-danger action-btn action-btn-delete" id="btnDelete" onclick="deleteSelected()">
-                        Apagar
-                    </button>
                     <button class="btn action-btn action-btn-share" id="btnShare" onclick="shareSelected()">
                         <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"></path></svg> Compartilhar
+                    </button>
+                    <button class="btn btn-primary action-btn action-btn-edit" id="btnEdit" onclick="editSelected()">
+                        <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg> Editar
+                    </button>
+                    <button class="btn btn-danger action-btn action-btn-delete" id="btnDelete" onclick="deleteSelected()">
+                        Apagar
                     </button>
                     <span class="selection-count" id="selectionCount">0 itens selecionados</span>
                 </div>
@@ -324,6 +327,27 @@ $shareBaseUrl = getenv('SHARE_BASE_URL') ?: '';
                 </div>
             <?php endif; ?>
         </div>
+    </div>
+
+    <div id="replaceModal" class="modal">
+        <div class="modal-content glass-panel replace-modal-content">
+            <h2 class="text-gradient">Substituir Arquivo</h2>
+            <p id="replaceFileNameDisplay" class="replace-file-name"></p>
+
+            <div class="form-group replace-form-group">
+                <label for="replaceFile">Novo arquivo</label>
+                <input type="file" id="replaceFile">
+            </div>
+
+            <div id="replaceResultArea" class="replace-result-area">
+                <p></p>
+            </div>
+
+            <div class="modal-actions replace-modal-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeReplaceModal()">Cancelar</button>
+                <button type="button" class="btn btn-primary shadow-glow" id="btnReplaceFile" onclick="replaceFile()">Confirmar</button>
+            </div>
+        </div>                        
     </div>
 
     <!-- Share Modal -->

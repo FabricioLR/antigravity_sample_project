@@ -23,7 +23,7 @@ class FileManager {
         return $this->getUserPrefix() . '/' . basename($filename);
     }
 
-    public function uploadFile(array $file): string {
+    public function uploadFile(array $file, bool $overwrite = false): string {
         if ($file['error'] !== UPLOAD_ERR_OK) {
             throw new Exception("Upload failed with error code: " . $file['error']);
         }
@@ -34,13 +34,13 @@ class FileManager {
         
         $path = $this->getFullContentPath($filename);
         
-        if ($this->storage->exists($path)) {
+        if ($this->storage->exists($path) && !$overwrite) {
             throw new Exception("File already exists.");
         }
 
         $content = file_get_contents($file['tmp_name']);
         if ($content === false) {
-             throw new Exception("Failed to read uploaded file.");
+            throw new Exception("Failed to read uploaded file.");
         }
 
         $this->storage->put($path, $content);

@@ -38,6 +38,22 @@ class OCIStorageTest extends TestCase {
         $this->assertEquals('content', $this->storage->get('test.txt'));
     }
 
+    public function testRename() {
+        $this->clientMock->expects($this->once())
+            ->method('putObject')
+            ->willReturn($this->createMock(OciResponse::class));
+
+        $this->storage->put('rename.txt', 'hello');
+
+        $this->clientMock->expects($this->once())
+            ->method('renameObject')
+            ->willReturn($this->createMock(OciResponse::class));
+
+        $this->storage->rename("rename.txt", "rename2.txt");
+
+        $this->assertTrue($this->storage->exists('rename2.txt'));
+    }
+
     public function testExists() {
         $this->clientMock->expects($this->once())
             ->method('headObject')
