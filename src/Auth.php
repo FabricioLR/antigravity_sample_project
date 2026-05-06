@@ -61,7 +61,7 @@ class Auth {
         return isset($_SESSION['must_change_password']) && $_SESSION['must_change_password'];
     }
 
-    public function getCurrentUserId(): ?int {
+    public function getCurrentUserId(): ?string {
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }

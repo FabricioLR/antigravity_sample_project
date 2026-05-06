@@ -16,12 +16,12 @@ class ShareManager {
     /**
      * Creates a new share link for a file.
      * 
-     * @param int $userId The ID of the user who owns the file.
+     * @param string $userId The ID of the user who owns the file.
      * @param string $filename The name of the file to share.
      * @param string $duration The duration of the share ('1h', '1d', or 'forever').
      * @return string The generated UUID for the share link.
      */
-    public function createShare(int $userId, string $filename, string $duration): string {
+    public function createShare(string $userId, string $filename, string $duration): string {
         $uuid = $this->generateUuidV4();
         $expiresAt = null;
 
@@ -58,10 +58,10 @@ class ShareManager {
     /**
      * Lists all shares for a specific user.
      * 
-     * @param int $userId The ID of the user.
+     * @param string $userId The ID of the user.
      * @return array List of shares.
      */
-    public function listShares(int $userId): array {
+    public function listShares(string $userId): array {
         $stmt = $this->pdo->prepare("
             SELECT * FROM shared_files 
             WHERE user_id = ?
@@ -75,10 +75,10 @@ class ShareManager {
      * Deletes a specific share.
      * 
      * @param string $uuid The UUID of the share.
-     * @param int $userId The ID of the user (for security).
+     * @param string $userId The ID of the user (for security).
      * @return bool True on success.
      */
-    public function deleteShare(string $uuid, int $userId): bool {
+    public function deleteShare(string $uuid, string $userId): bool {
         $stmt = $this->pdo->prepare("
             DELETE FROM shared_files 
             WHERE uuid = ? AND user_id = ?

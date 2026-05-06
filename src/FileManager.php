@@ -7,9 +7,9 @@ use Exception;
 
 class FileManager {
     private StorageInterface $storage;
-    private int $userId;
+    private string $userId;
 
-    public function __construct(int $userId, StorageInterface $storage) {
+    public function __construct(string $userId, StorageInterface $storage) {
         $this->userId = $userId;
         $this->storage = $storage;
         $this->storage->createDirectory($this->getUserPrefix());

@@ -5,6 +5,7 @@ namespace Tests;
 use App\Config\Database;
 use App\ShareManager;
 use PHPUnit\Framework\TestCase;
+use PDO;
 
 class ShareManagerTest extends TestCase {
     private Database $db;
@@ -22,7 +23,7 @@ class ShareManagerTest extends TestCase {
         
         $pdo->exec("
             CREATE TABLE users (
-                id SERIAL PRIMARY KEY,
+                id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
                 username VARCHAR(255) UNIQUE NOT NULL,
                 password VARCHAR(255) NOT NULL,
                 role VARCHAR(50) DEFAULT 'user',
@@ -34,7 +35,7 @@ class ShareManagerTest extends TestCase {
         $pdo->exec("
             CREATE TABLE shared_files (
                 uuid UUID PRIMARY KEY,
-                user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+                user_id UUID REFERENCES users(id) ON DELETE CASCADE,
                 filename TEXT NOT NULL,
                 expires_at TIMESTAMP NULL,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -42,11 +43,14 @@ class ShareManagerTest extends TestCase {
         ");
 
         // Create a default user for tests
-        $pdo->exec("INSERT INTO users (id, username, password) VALUES (1, 'admin', 'admin')");
+        $pdo->exec("INSERT INTO users (username, password) VALUES ('admin', 'admin')");
     }
 
     public function testCreateShareForever() {
-        $uuid = $this->shareManager->createShare(1, 'test_forever.txt', 'forever');
+        $stmt = $this->db->getConnection()->prepare("SELECT * FROM users WHERE username = ?");
+        $stmt->execute(['admin']);
+        $user = $stmt->fetch();
+        $uuid = $this->shareManager->createShare($user["id"], 'test_forever.txt', 'forever');
         // UUID v4 regex
         $this->assertMatchesRegularExpression('/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i', $uuid);
 
@@ -57,7 +61,10 @@ class ShareManagerTest extends TestCase {
     }
 
     public function testCreateShareWithExpiry() {
-        $uuid = $this->shareManager->createShare(1, 'test_1h.txt', '1h');
+        $stmt = $this->db->getConnection()->prepare("SELECT * FROM users WHERE username = ?");
+        $stmt->execute(['admin']);
+        $user = $stmt->fetch();
+        $uuid = $this->shareManager->createShare($user["id"], 'test_1h.txt', '1h');
         $share = $this->shareManager->getShare($uuid);
         
         $this->assertNotNull($share);
@@ -70,7 +77,10 @@ class ShareManagerTest extends TestCase {
     }
 
     public function testGetExpiredShareReturnsNull() {
-        $uuid = $this->shareManager->createShare(1, 'expired.txt', '1h');
+        $stmt = $this->db->getConnection()->prepare("SELECT * FROM users WHERE username = ?");
+        $stmt->execute(['admin']);
+        $user = $stmt->fetch();
+        $uuid = $this->shareManager->createShare($user["id"], 'expired.txt', '1h');
         
         // Manually set expiry to the past
         $stmt = $this->db->getConnection()->prepare("UPDATE shared_files SET expires_at = '2000-01-01 00:00:00' WHERE uuid = ?");
@@ -82,8 +92,11 @@ class ShareManagerTest extends TestCase {
 
     public function testCleanupExpiredShares() {
         // Create one active and one expired share
-        $uuidActive = $this->shareManager->createShare(1, 'active.txt', 'forever');
-        $uuidExpired = $this->shareManager->createShare(1, 'to_cleanup.txt', '1h');
+        $stmt = $this->db->getConnection()->prepare("SELECT * FROM users WHERE username = ?");
+        $stmt->execute(['admin']);
+        $user = $stmt->fetch();
+        $uuidActive = $this->shareManager->createShare($user["id"], 'active.txt', 'forever');
+        $uuidExpired = $this->shareManager->createShare($user["id"], 'to_cleanup.txt', '1h');
         
         $stmt = $this->db->getConnection()->prepare("UPDATE shared_files SET expires_at = '2000-01-01 00:00:00' WHERE uuid = ?");
         $stmt->execute([$uuidExpired]);
@@ -104,12 +117,14 @@ class ShareManagerTest extends TestCase {
         // This tests the ON DELETE CASCADE constraint
         $pdo = $this->db->getConnection();
         // Ensure user 999 exists for test
-        $pdo->exec("INSERT INTO users (id, username, password) VALUES (999, 'testuser_delete', 'pass') ON CONFLICT (id) DO UPDATE SET username = EXCLUDED.username");
-        
-        $uuid = $this->shareManager->createShare(999, 'cascadetest.txt', 'forever');
+        $stmt = $this->db->getConnection()->prepare("INSERT INTO users (username, password) VALUES (?, ?) RETURNING id");
+        $stmt->execute(['testuser_delete', 'pass']);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        $uuid = $this->shareManager->createShare($result['id'], 'cascadetest.txt', 'forever');
         $this->assertNotNull($this->shareManager->getShare($uuid));
 
-        $pdo->exec("DELETE FROM users WHERE id = 999");
+        $pdo->exec("DELETE FROM users WHERE id = '" . $result['id'] . "'");
         
         // The share should be gone
         $stmt = $pdo->prepare("SELECT COUNT(*) FROM shared_files WHERE uuid = ?");
@@ -118,10 +133,13 @@ class ShareManagerTest extends TestCase {
     }
 
     public function testListShares() {
-        $this->shareManager->createShare(1, 'file1.txt', 'forever');
-        $this->shareManager->createShare(1, 'file2.txt', '1h');
+        $stmt = $this->db->getConnection()->prepare("SELECT * FROM users WHERE username = ?");
+        $stmt->execute(['admin']);
+        $user = $stmt->fetch();
+        $this->shareManager->createShare($user['id'], 'file1.txt', 'forever');
+        $this->shareManager->createShare($user['id'], 'file2.txt', '1h');
         
-        $shares = $this->shareManager->listShares(1);
+        $shares = $this->shareManager->listShares($user['id']);
         $this->assertCount(2, $shares);
         // Should be ordered by created_at DESC, so file2.txt is likely first if created after
         $this->assertEquals('file2.txt', $shares[0]['filename']);
@@ -129,19 +147,25 @@ class ShareManagerTest extends TestCase {
     }
 
     public function testDeleteShare() {
-        $uuid = $this->shareManager->createShare(1, 'todelete.txt', 'forever');
+        $stmt = $this->db->getConnection()->prepare("SELECT * FROM users WHERE username = ?");
+        $stmt->execute(['admin']);
+        $user = $stmt->fetch();
+        $uuid = $this->shareManager->createShare($user["id"], 'todelete.txt', 'forever');
         $this->assertNotNull($this->shareManager->getShare($uuid));
 
-        $result = $this->shareManager->deleteShare($uuid, 1);
+        $result = $this->shareManager->deleteShare($uuid, $user['id']);
         $this->assertTrue($result);
         $this->assertNull($this->shareManager->getShare($uuid));
     }
 
     public function testDeleteShareInvalidUser() {
-        $uuid = $this->shareManager->createShare(1, 'notmine.txt', 'forever');
+        $stmt = $this->db->getConnection()->prepare("SELECT * FROM users WHERE username = ?");
+        $stmt->execute(['admin']);
+        $user = $stmt->fetch();
+        $uuid = $this->shareManager->createShare($user["id"], 'notmine.txt', 'forever');
         
         // Try to delete with user 2 (which doesn't exist but we want to check user_id check)
-        $result = $this->shareManager->deleteShare($uuid, 2);
+        $result = $this->shareManager->deleteShare($uuid, "38b6b309-74c3-4eab-88e1-64a2a0f9d4ac");
         $this->assertFalse($result);
         $this->assertNotNull($this->shareManager->getShare($uuid));
     }

@@ -52,7 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 // Handle rem user
 if (isset($_GET['action']) && $_GET['action'] === 'delete' && isset($_GET['id'])) {
     try {
-        $idToRemove = (int) $_GET['id'];
+        $idToRemove = (string) $_GET['id'];
         if ($idToRemove === $auth->getCurrentUserId()) {
             throw new Exception("Não é possível remover a si próprio.");
         }
@@ -79,7 +79,7 @@ $successMsg = $_GET['success'] ?? $success;
     <link rel="stylesheet" href="/css/admin.css">
 </head>
 <body>
-    <nav class="navbar glass-panel admin-nav">
+    <nav class="navbar glass-panel dashboard-nav">
         <a href="/dashboard.php" class="nav-logo-link"><h2 class="text-gradient nav-logo-text">Web Storage</h2></a>
         <div class="nav-links nav-links-override">
             <div class="profile-dropdown" id="profileDropdown">
@@ -90,6 +90,10 @@ $successMsg = $_GET['success'] ?? $success;
                     <a href="/dashboard.php" class="dropdown-item dropdown-item-override">
                         <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path></svg>
                         Meus Arquivos
+                    </a>
+                    <a href="/shares.php" class="dropdown-item dropdown-item-override">
+                        <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"></path></svg>
+                        Compartilhamentos
                     </a>
                     <?php if (isset($auth) && $auth->isAdmin()): ?>
                     <a href="/admin.php" class="dropdown-item dropdown-item-override">
@@ -148,7 +152,7 @@ $successMsg = $_GET['success'] ?? $success;
                     <tbody>
                         <?php foreach ($users as $user): ?>
                             <tr class="file-row">
-                                <td>#<?= $user['id'] ?></td>
+                                <td><?= $user['id'] ?></td>
                                 <td>
                                     <div class="file-name">
                                         <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
@@ -203,7 +207,7 @@ $successMsg = $_GET['success'] ?? $success;
                         </select>
                     </div>
                     
-                    <button type="submit" class="btn btn-primary btn-block btn-submit-override">
+                    <button type="submit" class="btn btn-primary btn-block btn-submit-override" name="action" value="add_user">
                         <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="icon-align"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
                         Criar Usuário
                     </button>
